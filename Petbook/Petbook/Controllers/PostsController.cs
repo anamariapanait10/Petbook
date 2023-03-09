@@ -98,7 +98,6 @@ namespace Petbook.Controllers
 
        
         // form for adding a new post
-
         [Authorize(Roles = "User,Admin")]
         public IActionResult New()
         {
