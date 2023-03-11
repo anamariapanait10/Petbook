@@ -37,7 +37,8 @@ namespace Petbook.Controllers
 
             return View();
         }
-
+        
+        [HttpPost]
         [Authorize(Roles = "User")]
         public IActionResult Delete(int blogPostId)
         {
@@ -48,11 +49,13 @@ namespace Petbook.Controllers
             if(blogPostLikes != null)
             {
                 db.Remove(blogPostLikes);
+                db.SaveChanges();
             }
 
             return RedirectToAction("BlogPosts", "Index");
         }
 
+        [HttpPost]
         [Authorize(Roles = "User")]
         public IActionResult New(int blogPostId)
         {
@@ -60,7 +63,7 @@ namespace Petbook.Controllers
             blogPostLike.UserId = _userManager.GetUserId(User);
             blogPostLike.BlogPostId = blogPostId;
             db.BlogPostLikes.Add(blogPostLike);
-
+            db.SaveChanges();
             return RedirectToAction("BlogPosts", "Index");
         }
     }
