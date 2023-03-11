@@ -14,12 +14,6 @@ namespace Petbook.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public PostsController(ApplicationDbContext context)
-        {
-            db = context;
-            _userManager = null;
-            _roleManager = null;
-        }
         public PostsController(
             ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
@@ -38,7 +32,7 @@ namespace Petbook.Controllers
         public IActionResult Index()
         {
             var posts = db.Posts.Include("Pet")
-                                .Include("PostLike")
+                                .Include("PostLikes")
                                 .Include("Comments")
                                 .Include("Comments.User")
                                 .ToList();
@@ -60,7 +54,7 @@ namespace Petbook.Controllers
         public IActionResult Show(int id)
         {
             Post post = db.Posts.Include("Pet")
-                                .Include("PostLike")
+                                .Include("PostLikes")
                                 .Include("Comments")
                                 .Include("Comments.User")
                                 .Where(p => p.PostId == id)
@@ -86,7 +80,7 @@ namespace Petbook.Controllers
             else
             {
                 Post p = db.Posts.Include("Pet")
-                                .Include("PostLike")
+                                .Include("PostLikes")
                                 .Include("Comments")
                                 .Include("Comments.User")
                                 .Where(p => p.PostId == comment.PostId)
