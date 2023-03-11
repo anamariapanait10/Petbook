@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +11,7 @@ namespace Petbook.Controllers
     public class BlogPostsController : Controller
     {
         private readonly ApplicationDbContext db;
-
         private readonly UserManager<ApplicationUser> _userManager;
-
         private readonly RoleManager<IdentityRole> _roleManager;
         public BlogPostsController(
            ApplicationDbContext context,
@@ -22,9 +20,7 @@ namespace Petbook.Controllers
            )
         {
             db = context;
-
             _userManager = userManager;
-
             _roleManager = roleManager;
         }
 
@@ -33,36 +29,20 @@ namespace Petbook.Controllers
         {
             if (User.IsInRole("User"))
             {
-                var blogPosts = from blogPost in db.BlogPosts.Include("User")
+                var blogPosts = db.BlogPosts.Include("User")
                               .Where(b => b.UserId == _userManager.GetUserId(User))
-                                select blogPost;
-
+                              .ToList();
                 ViewBag.BlogPosts = blogPosts;
                 return View();
             }
-
             else
             {
-                //adminul poate vedea toate postarile tuturor userilor
-                if (User.IsInRole("Admin"))
-                {
-                    var blogPosts = from blogPost in db.BlogPosts.Include("User")
-                                    select blogPost;
-                    ViewBag.BlogPosts = blogPosts;
-
-                    return View();
-                }
-
-                else
-                {
-                    TempData["message"] = "Iti trebuie un cont pentru a vedea postarile";
-                    //aici ar trebui redirectionare catre pagina de logare/ autentificare care nu exista inca
-                    //return RedirectToAction("Index", "BlogPosts");
-                    return View();
-                }
-
+                //the admin can see the blog posts of all users
+                var blogPosts = db.BlogPosts.Include("User")
+                                .ToList();
+                ViewBag.BlogPosts = blogPosts;
+                return View();
             }
-
         }
 
         [Authorize(Roles = "User,Admin")]
@@ -71,59 +51,48 @@ namespace Petbook.Controllers
             if (User.IsInRole("User"))
             {
                 var blogPosts = db.BlogPosts
-                                  .Include("BlogPostsLike")
-                                  .Include("BlogPostsTag")
+                                  .Include("BlogPostLike")
+                                  .Include("BlogPostTag")
                                   .Include("User")
                                   .Where(b => b.BlogPostId == id)
                                   .Where(b => b.UserId == _userManager.GetUserId(User))
                                   .FirstOrDefault();
                 if (blogPosts == null)
                 {
-                    TempData["message"] = "Postarea nu exista sau nu aveti drepturi de acces";
+                    TempData["message"] = "The blog post doesn't exist";
                     return RedirectToAction("Index", "BlogPosts");
                 }
 
                 return View(blogPosts);
-
             }
-
             else
-            if (User.IsInRole("Admin"))
             {
                 var blogPosts = db.BlogPosts
-                                  .Include("BlogPostsLike")
-                                  .Include("BlogPostsTag")
+                                  .Include("BlogPostLike")
+                                  .Include("BlogPostTag")
                                   .Include("User")
                                   .Where(b => b.BlogPostId == id)
                                   .FirstOrDefault();
 
-
-
                 if (blogPosts == null)
                 {
-                    TempData["message"] = "Postarea cautata nu poate fi gasita";
+                    TempData["message"] = "The blog post could not be found.";
                     return RedirectToAction("Index", "BlogPosts");
                 }
-
-
                 return View(blogPosts);
             }
-            else
-            {
-                TempData["message"] = "Nu aveti drepturi";
-                //si aici ar trebui facuta redirectionare catre logare/ autentifcare
-                return RedirectToAction("Index", "BlogPosts");
-            }
+            
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Admin")]
         public IActionResult New()
         {
-            return View();
+            BlogPost bp = new BlogPost();
+            return View(bp);
         }
 
         [HttpPost]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Admin")]
         public ActionResult New(BlogPost bp)
         {
             bp.UserId = _userManager.GetUserId(User);
@@ -132,7 +101,7 @@ namespace Petbook.Controllers
             {
                 db.BlogPosts.Add(bp);
                 db.SaveChanges();
-                TempData["message"] = "Postarea a fost adaugata";
+                TempData["message"] = "The blog post was added.";
                 return RedirectToAction("Index");
             }
 
@@ -143,34 +112,39 @@ namespace Petbook.Controllers
         }
 
 
-        [Authorize(Roles = "User, Admin")]
+        [Authorize(Roles = "User,Admin")]
         public IActionResult Edit(int id)
         {
 
-            BlogPost blogPost = db.BlogPosts.Include("User")
-                                            .Include("BlogPostsLike")
-                                            .Include("BlogPostsTag")
-                                        .Where(bp => bp.BlogPostId == id)
-                                        .Where(b => b.UserId == _userManager.GetUserId(User))
-                                        .FirstOrDefault();
-
-
-            if (blogPost.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
+            BlogPost? blogPost = db.BlogPosts.Include("User")
+                                            .Include("BlogPostLike")
+                                            .Include("BlogPostTag")
+                                            .Where(bp => bp.BlogPostId == id)
+                                            .Where(b => b.UserId == _userManager.GetUserId(User))
+                                            .FirstOrDefault();
+            if(blogPost != null)
             {
-                return View(blogPost);
-            }
+                if (blogPost.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
+                {
+                    return View(blogPost);
+                }
 
+                else
+                {
+                    TempData["message"] = "This blog post can only be edited by the owner.";
+                    return RedirectToAction("Index");
+                }
+            }
             else
             {
-                TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unei postari care nu va apartine";
+                TempData["message"] = "This blog post doesn't exist.";
                 return RedirectToAction("Index");
             }
-
         }
 
-        // Se adauga postarea modificata in baza de date
+        //Add the modified blog post to the database
         [HttpPost]
-        [Authorize(Roles = "Editor,Admin")]
+        [Authorize(Roles = "User,Admin")]
         public IActionResult Edit(int id, BlogPost requestBlogPost)
         {
 
@@ -183,14 +157,13 @@ namespace Petbook.Controllers
                 {
 
                     blogPost.BlogPostContent = requestBlogPost.BlogPostContent;
-
-                    TempData["message"] = "Postarea a fost modificata";
+                    TempData["message"] = "The blog post was modified.";
                     db.SaveChanges();
                     return RedirectToAction("Index");
                 }
                 else
                 {
-                    TempData["message"] = "Nu aveti dreptul sa faceti modificari asupra unei postari care nu va apartine";
+                    TempData["message"] = "The blog post can only be edited by the owner.";
                     return RedirectToAction("Index");
                 }
             }
@@ -201,29 +174,34 @@ namespace Petbook.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Editor,Admin")]
+        [Authorize(Roles = "User,Admin")]
         public ActionResult Delete(int id)
         {
-            BlogPost blogPost = db.BlogPosts.Include("BlogPostsLikes")
+            BlogPost? blogPost = db.BlogPosts.Include("BlogPostsLikes")
                                          .Include("BlogPostsTags")
-                                         .Where(art => art.BlogPostId == id)
-                                         .Where(b => b.UserId == _userManager.GetUserId(User))
+                                         .Where(bp => bp.BlogPostId == id)
+                                         .Where(bp => bp.UserId == _userManager.GetUserId(User))
                                          .FirstOrDefault();
-
-            if (blogPost.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
+            if (blogPost != null)
             {
-                db.BlogPosts.Remove(blogPost);
-                db.SaveChanges();
-                TempData["message"] = "Postarea a fost stearsa";
-                return RedirectToAction("Index");
+                if (blogPost.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
+                {
+                    db.BlogPosts.Remove(blogPost);
+                    db.SaveChanges();
+                    TempData["message"] = "The blog post was deleted";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    TempData["message"] = "The blog post can only be deleted by the owner.";
+                    return RedirectToAction("Index");
+                }
             }
-
             else
             {
-                TempData["message"] = "Nu aveti dreptul sa stergeti o postare care nu va apartine";
+                TempData["message"] = "The blog post does not exist.";
                 return RedirectToAction("Index");
             }
         }
-
     }
 }
