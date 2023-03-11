@@ -11,9 +11,7 @@ namespace Petbook.Controllers
     public class BlogPostLikesController : Controller
     {
         private readonly ApplicationDbContext db;
-
         private readonly UserManager<ApplicationUser> _userManager;
-
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public BlogPostLikesController(
@@ -23,20 +21,18 @@ namespace Petbook.Controllers
             )
         {
             db = context;
-
             _userManager = userManager;
-
             _roleManager = roleManager;
         }
 
         [Authorize(Roles = "User")]
         public IActionResult Show(int blogPostId)
         {
-            var blogpostlikes = from blogpostlike in db.BlogPostLikes
-                                                        .Include("User")
-                                                        .Include("BlogPost")
-                                                        .Where(bpl => bpl.BlogPostId == blogPostId)
-                                select blogpostlike;
+            var blogpostlikes = db.BlogPostLikes
+                                .Include("User")
+                                .Include("BlogPost")
+                                .Where(bpl => bpl.BlogPostId == blogPostId)
+                                .ToList();
             ViewBag.BlogPostLikes = blogpostlikes;
 
             return View();
@@ -45,14 +41,15 @@ namespace Petbook.Controllers
         [Authorize(Roles = "User")]
         public IActionResult Delete(int blogPostId)
         {
-            var blogPostLikes = from blogPostLike in db.BlogPostLikes
+            var blogPostLikes = db.BlogPostLikes
                                .Where(bpl => bpl.BlogPostId == blogPostId &&
                                bpl.UserId == _userManager.GetUserId(User))
-                               select blogPostLike;
+                               .ToList();
             if(blogPostLikes != null)
             {
                 db.Remove(blogPostLikes);
             }
+
             return RedirectToAction("BlogPosts", "Index");
         }
 
@@ -62,7 +59,6 @@ namespace Petbook.Controllers
             var blogPostLike = new BlogPostLike();
             blogPostLike.UserId = _userManager.GetUserId(User);
             blogPostLike.BlogPostId = blogPostId;
-
             db.BlogPostLikes.Add(blogPostLike);
 
             return RedirectToAction("BlogPosts", "Index");
