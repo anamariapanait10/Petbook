@@ -141,7 +141,7 @@ namespace Petbook.Controllers
             else
             {
                 TempData["message"] = "Cannot edit the posts that aren't yours";
-                return RedirectToAction("Index");
+                return RedirectToAction("Show/"+id);
             }
 
         }
@@ -165,12 +165,12 @@ namespace Petbook.Controllers
                     post.PostDate = requestPost.PostDate;
                     TempData["message"] = "The post has been modified";
                     db.SaveChanges();
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Show/" + id);
                 }
                 else
                 {
                     TempData["message"] = "Cannot edit the posts that aren't yours";
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Show/" + id);
                 }
             }
             else
