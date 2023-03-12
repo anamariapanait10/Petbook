@@ -22,12 +22,13 @@ namespace Petbook.Controllers
             _roleManager = roleManager;
         }
 
-
+        //adding a new blog post tag means assigning a given tag to a given blog post
         [HttpPost]
         public IActionResult New(BlogPostTag requestBlogPostTag)
         {
             if (ModelState.IsValid)
             {
+                //if the tag already exists, we cannot add another one identical to it
                 if (db.BlogPostTags
                     .Where(bpt => bpt.BlogPostTagId == requestBlogPostTag.BlogPostTagId)
                     .Where(bpt => bpt.BlogPostId == requestBlogPostTag.BlogPostId)
@@ -51,7 +52,7 @@ namespace Petbook.Controllers
             return Redirect("/BlogPosts/Show/" + requestBlogPostTag.BlogPostTagId);
         }
 
-
+        //when a tag is deleted, we should remove the linkage with the blog post
         [HttpPost]
         public IActionResult Delete(BlogPostTag requestBlogPostTag)
         {
