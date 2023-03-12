@@ -25,7 +25,7 @@ namespace Petbook.Controllers
             _roleManager = roleManager;
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Admin")]
         public IActionResult Show(int blogPostId)
         {
             var blogpostlikes = db.BlogPostLikes
@@ -37,9 +37,22 @@ namespace Petbook.Controllers
 
             return View();
         }
-        
+
         [HttpPost]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User,Admin")]
+        public IActionResult New(int blogPostId)
+        {
+            var blogPostLike = new BlogPostLike();
+            blogPostLike.UserId = _userManager.GetUserId(User);
+            blogPostLike.BlogPostId = blogPostId;
+            db.BlogPostLikes.Add(blogPostLike);
+            db.SaveChanges();
+
+            return RedirectToAction("BlogPosts", "Index");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "User,Admin")]
         public IActionResult Delete(int blogPostId)
         {
             var blogPostLikes = db.BlogPostLikes
@@ -52,18 +65,6 @@ namespace Petbook.Controllers
                 db.SaveChanges();
             }
 
-            return RedirectToAction("BlogPosts", "Index");
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "User")]
-        public IActionResult New(int blogPostId)
-        {
-            var blogPostLike = new BlogPostLike();
-            blogPostLike.UserId = _userManager.GetUserId(User);
-            blogPostLike.BlogPostId = blogPostId;
-            db.BlogPostLikes.Add(blogPostLike);
-            db.SaveChanges();
             return RedirectToAction("BlogPosts", "Index");
         }
     }
