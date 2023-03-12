@@ -8,7 +8,7 @@ namespace Petbook.Models
         public int BlogPostId { get; set; }
         public string? UserId { get; set; }
         public virtual ApplicationUser? User { get; set; }
-        [Required(ErrorMessage = "Continutul postarii este obligatoriu")]
+        [Required(ErrorMessage = "The content of the post is required")]
         public string? BlogPostContent { get; set; }
         public virtual ICollection<BlogPostLike>? BlogPostLikes { get; set; }
 

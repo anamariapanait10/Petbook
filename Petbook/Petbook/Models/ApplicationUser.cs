@@ -11,6 +11,9 @@ namespace Petbook.Models
 
         public string? ProfilePhoto { get; set; }
 
+        [Required(ErrorMessage = "The phone number is required")]
+        public string PhoneNumber { get; set; }
+    
         public virtual ICollection<Pet>? Pets { get; set; }
 
         public virtual ICollection<Comment>? Comments { get; set; }
