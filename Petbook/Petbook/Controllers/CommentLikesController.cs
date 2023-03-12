@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,17 +8,16 @@ using System.Data;
 
 namespace Petbook.Controllers
 {
-    public class BlogPostLikesController : Controller
+    public class CommentLikesController : Controller
     {
         private readonly ApplicationDbContext db;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
-
-        public BlogPostLikesController(
-            ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager
-            )
+        public CommentLikesController(
+           ApplicationDbContext context,
+           UserManager<ApplicationUser> userManager,
+           RoleManager<IdentityRole> roleManager
+           )
         {
             db = context;
             _userManager = userManager;
@@ -26,14 +25,14 @@ namespace Petbook.Controllers
         }
 
         [Authorize(Roles = "User,Admin")]
-        public IActionResult Index(int blogPostId)
+        public IActionResult Index(int commentId)
         {
-            var blogpostlikes = db.BlogPostLikes
+            var commentLikes = db.CommentLikes
                                 .Include("User")
-                                .Include("BlogPost")
-                                .Where(bpl => bpl.BlogPostId == blogPostId)
+                                .Include("Comment")
+                                .Where(cl => cl.CommentId == commentId)
                                 .ToList();
-            ViewBag.BlogPostLikes = blogpostlikes;
+            ViewBag.CommentLikes = commentLikes;
 
             return View();
         }
@@ -59,7 +58,7 @@ namespace Petbook.Controllers
                                .Where(bpl => bpl.BlogPostId == blogPostId &&
                                bpl.UserId == _userManager.GetUserId(User))
                                .ToList();
-            if(blogPostLikes != null)
+            if (blogPostLikes != null)
             {
                 db.Remove(blogPostLikes);
                 db.SaveChanges();

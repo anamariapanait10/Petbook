@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Petbook.Data;
 using Petbook.Models;
 using System.Data;
@@ -46,8 +47,12 @@ namespace Petbook.Controllers
         [Authorize(Roles = "User,Admin")]
         public IActionResult Delete(int commentId)
         {
-            Comment comment = db.Comments.Find(commentId);
-            if (comment.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
+            Comment comment = db.Comments
+                              .Include("Post")
+                              .Include("Post.Pet.User")
+                              .Where(c => c.CommentId == commentId)
+                              .First();
+            if (comment.Post.Pet.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
             {
                 db.Comments.Remove(comment);
                 db.SaveChanges();
