@@ -12,7 +12,7 @@ namespace Petbook.Models
 
         [Required (ErrorMessage = "The name of the pet is required")]
         [StringLength (30, ErrorMessage = "Name cannot have more than 30 characters")]
-        [MinLength (1, ErrorMessage = "Name muste have more than 1 character")]
+        [MinLength (1, ErrorMessage = "Name must have more than 1 character")]
         public string? PetName { get; set; }
 
         [Required(ErrorMessage = "The category of the pet is required")]
