@@ -51,8 +51,8 @@ namespace Petbook.Controllers
             if (User.IsInRole("User"))
             {
                 var blogPosts = db.BlogPosts
-                                  .Include("BlogPostLike")
-                                  .Include("BlogPostTag")
+                                  .Include("BlogPostLikes")
+                                  .Include("BlogPostTags")
                                   .Include("User")
                                   .Where(b => b.BlogPostId == id)
                                   .Where(b => b.UserId == _userManager.GetUserId(User))
@@ -68,8 +68,8 @@ namespace Petbook.Controllers
             else
             {
                 var blogPosts = db.BlogPosts
-                                  .Include("BlogPostLike")
-                                  .Include("BlogPostTag")
+                                  .Include("BlogPostLikes")
+                                  .Include("BlogPostTags")
                                   .Include("User")
                                   .Where(b => b.BlogPostId == id)
                                   .FirstOrDefault();
@@ -117,8 +117,8 @@ namespace Petbook.Controllers
         {
 
             BlogPost? blogPost = db.BlogPosts.Include("User")
-                                            .Include("BlogPostLike")
-                                            .Include("BlogPostTag")
+                                            .Include("BlogPostLikes")
+                                            .Include("BlogPostTags")
                                             .Where(bp => bp.BlogPostId == id)
                                             .Where(b => b.UserId == _userManager.GetUserId(User))
                                             .FirstOrDefault();
@@ -177,8 +177,8 @@ namespace Petbook.Controllers
         [Authorize(Roles = "User,Admin")]
         public ActionResult Delete(int id)
         {
-            BlogPost? blogPost = db.BlogPosts.Include("BlogPostsLikes")
-                                         .Include("BlogPostsTags")
+            BlogPost? blogPost = db.BlogPosts.Include("BlogPostLikes")
+                                         .Include("BlogPostTags")
                                          .Where(bp => bp.BlogPostId == id)
                                          .Where(bp => bp.UserId == _userManager.GetUserId(User))
                                          .FirstOrDefault();
