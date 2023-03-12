@@ -12,7 +12,7 @@ namespace Petbook.Models
         [Required (ErrorMessage = "Photo is required")]
         public string? Photo { get; set; }
         public string? Description { get; set; }
-        public DateTime? Date {get; set; }
+        public DateTime? PostDate {get; set; }
         public virtual ICollection<Comment>? Comments { get; set; }
         public virtual ICollection<PostLike>? PostLikes { get; set; }
     }
