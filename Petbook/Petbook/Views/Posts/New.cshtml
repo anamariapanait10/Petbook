@@ -1,0 +1,50 @@
+﻿@model Petbook.Models.Post
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-6 offset-3 border" style="border-radius:0.3rem">
+
+            <ul class="nav nav-tabs mt-3">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/Posts/New">Create a new post</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/BlogPosts/New">Create a new blog post</a>
+                </li>
+            </ul>
+            <br />
+            <br />
+            
+            @using (Html.BeginForm(actionName: "New", controllerName: "Posts", method: FormMethod.Post))
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PetId, " Select the pet", new { @class = "control-label" })
+                    @Html.DropDownListFor(m => m.PetId, new SelectList(Model.Pets, "Value", "Text"),
+                    "Select the pet", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.PetId, null, new { @class = "text-danger" })
+                </div>
+                <br />
+                <br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PostPhoto, " Upload an image", new { @class = "control-label" })
+                    @Html.TextBoxFor(model => model.PostPhoto, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.PostPhoto, null, new { @class = "text-danger" })
+                </div>
+                <br />
+                <br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Description, " Description", new { @class = "control-label" })
+                    @Html.TextBoxFor(model => model.Description, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Description, null, new { @class = "text-danger" })
+                </div>
+                
+                <div class="form-group mt-4">
+                    <input type="submit" value="Share" class="btn btn-primary"  style="float: right"/>
+                </div>
+                <br />
+                <br />
+                <br />
+             }
+        </div>
+    </div>
+</div>

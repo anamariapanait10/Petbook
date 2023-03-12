@@ -1,0 +1,19 @@
+﻿@model Petbook.Models.Post
+
+<div class="card-body">
+
+    <h3 class="card-title alert-success py-3 px-3 rounded-2">@Model.Pet.PetName</h3>
+
+    <img src=@Model.PostPhoto alt="No photo">
+
+    <div class="d-flex justify-content-between flex-column mt-5 mx-4">
+        <div> <i class="bi bi-hand-thumbs-up"></i>@Model.PostLikes.Count Likes</div>
+        
+        <br />
+        <div class="d-flex justify-content-center flex-row">
+            <input class="form-control" placeholder="Add a comment"/>
+            <button class="btn btn-success text-right" type="submit">Post</button>
+        </div>
+    </div>
+
+</div>
