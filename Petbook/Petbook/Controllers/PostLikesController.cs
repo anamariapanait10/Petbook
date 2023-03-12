@@ -44,9 +44,9 @@ namespace Petbook.Controllers
         // delete a like for a post in the db
         [HttpPost]
         [Authorize(Roles = "User,Admin")]
-        public IActionResult Delete(int postId, string userId)
+        public IActionResult Delete(int postId)
         {   
-            PostLike p = db.PostLikes.Where(p => p.PostId == postId && p.UserId == userId).First();
+            PostLike p = db.PostLikes.Where(p => p.PostId == postId).First();
           
             if (p.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
             {
