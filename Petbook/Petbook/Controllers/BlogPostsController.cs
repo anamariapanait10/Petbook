@@ -55,7 +55,6 @@ namespace Petbook.Controllers
                                   .Include("BlogPostTags")
                                   .Include("User")
                                   .Where(b => b.BlogPostId == id)
-                                  .Where(b => b.UserId == _userManager.GetUserId(User))
                                   .FirstOrDefault();
                 if (blogPosts == null)
                 {
@@ -120,7 +119,6 @@ namespace Petbook.Controllers
                                             .Include("BlogPostLikes")
                                             .Include("BlogPostTags")
                                             .Where(bp => bp.BlogPostId == id)
-                                            .Where(b => b.UserId == _userManager.GetUserId(User))
                                             .FirstOrDefault();
             if(blogPost != null)
             {
@@ -180,7 +178,6 @@ namespace Petbook.Controllers
             BlogPost? blogPost = db.BlogPosts.Include("BlogPostLikes")
                                          .Include("BlogPostTags")
                                          .Where(bp => bp.BlogPostId == id)
-                                         .Where(bp => bp.UserId == _userManager.GetUserId(User))
                                          .FirstOrDefault();
             if (blogPost != null)
             {
