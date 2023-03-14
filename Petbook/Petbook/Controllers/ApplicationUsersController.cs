@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Petbook.Data;
 using Petbook.Models;
+using System.Data;
 
 namespace Petbook.Controllers
 {
@@ -25,16 +27,23 @@ namespace Petbook.Controllers
 
         public IActionResult Index()
         {
-            var users = db.Users;
+            var users = db.ApplicationUsers;
             ViewBag.UsersList = users;
             return View();
         }
+        [Authorize(Roles = "User,Admin")]
 
-        public async Task<ActionResult> Show(string id)
+        public IActionResult Profile()
         {
-            ApplicationUser user = db.Users.Find(id);
-            var roles = await _userManager.GetRolesAsync(user);
+            return Redirect("/ApplicationUsers/Show/" + _userManager.GetUserId(User));
 
+        }
+
+        public async Task<ActionResult> Show(string id )
+        {
+            ApplicationUser user = db.ApplicationUsers.Include("Followers").Where(u=>u.Id==id).First();
+            var roles = await _userManager.GetRolesAsync(user);
+            
             ViewBag.Roles = roles;
 
             return View(user);
@@ -42,7 +51,7 @@ namespace Petbook.Controllers
 
         public async Task<ActionResult> Edit(string id)
         {
-            ApplicationUser user = db.Users.Find(id);
+            ApplicationUser user = db.ApplicationUsers.Find(id);
 
             user.AllRoles = GetAllRoles();
 
@@ -61,7 +70,7 @@ namespace Petbook.Controllers
         [HttpPost]
         public async Task<ActionResult> Edit(string id, ApplicationUser newData, [FromForm] string newRole)
         {
-            ApplicationUser user = db.Users.Find(id);
+            ApplicationUser user = db.ApplicationUsers.Find(id);
 
             user.AllRoles = GetAllRoles();
 
@@ -92,7 +101,7 @@ namespace Petbook.Controllers
         [HttpPost]
         public IActionResult Delete(string id)
         {
-            var user = db.Users
+            var user = db.ApplicationUsers
                          .Include("Pets")
                          .Include("Comments")
                          .Include("BlogPosts")
