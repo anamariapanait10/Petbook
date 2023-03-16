@@ -7,18 +7,26 @@
     <h2 class="alert-success p-3 rounded-3 text-center mb-5">@ViewBag.Message</h2>
 }
 
-<br />
 
-
-@foreach (Petbook.Models.Post post in ViewBag.Posts)
-{
-    <div class="card text-center" style="width:600px">
-
-    @Html.Partial("PostInfo", post )
-
-
+<div >
+    <div style="width:600px; margin:auto; text-align:center; width: calc(30vw - 2px);">
+        <ul class="nav nav-tabs mt-3">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/Posts/Index">Posts</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/BlogPosts/Index">Blog posts</a>
+            </li>
+        </ul>
     </div>
+    <br />
 
-    <br />
-    <br />
-}
+    @foreach (Petbook.Models.Post post in ViewBag.Posts)
+    {
+        <div class="card" style="width: 30vw; margin:auto; text-align:center">
+            @Html.Partial("PostInfo", post )
+        
+        </div>
+        <br />
+    }
+</div>

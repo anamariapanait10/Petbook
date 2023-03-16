@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Petbook.Data;
 using Petbook.Models;
 using System.Data;
+using System.Diagnostics.Eventing.Reader;
 
 namespace Petbook.Controllers
 {
@@ -25,40 +26,39 @@ namespace Petbook.Controllers
         }
 
         // add a like for a post in the db
-        [HttpPost]
-        public IActionResult New(PostLike p)
-        {
-            if (ModelState.IsValid)
+        [Authorize(Roles = "User,Admin")]
+        [HttpPost("PostLikes/AddLike/{postId}")]
+        public ActionResult<string> AddLike(int postId)
+        {   
+            var postlike = db.PostLikes
+                           .Where(p => p.PostId == postId && p.UserId == _userManager.GetUserId(User))
+                           .FirstOrDefault();
+            if (postlike == null)
             {
+                var p = new PostLike();
+                p.PostId = postId;
+                p.UserId = _userManager.GetUserId(User);
                 db.PostLikes.Add(p);
                 db.SaveChanges();
-                return Redirect("/Posts/Show/" + p.PostId);
-            }
-            else
+                return Ok("Post with id " + postId + " liked");
+            } else
             {
-                return Redirect("/Posts/Show/" + p.PostId);
+                DeleteLike(postId);
+                return Ok("Post with id " + postId + " unliked");
             }
-
         }
 
-        // delete a like for a post in the db
-        [HttpPost]
+        // unlike a post that was liked
         [Authorize(Roles = "User,Admin")]
-        public IActionResult Delete(int postId)
-        {   
-            PostLike p = db.PostLikes.Where(p => p.PostId == postId).First();
-          
-            if (p.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
+        private void DeleteLike(int postId)
+        {
+            var postlike = db.PostLikes
+                           .Where(p => p.PostId == postId && p.UserId == _userManager.GetUserId(User))
+                           .FirstOrDefault();
+            if (postlike != null)
             {
-                db.PostLikes.Remove(p);
+                db.PostLikes.Remove(postlike);
                 db.SaveChanges();
-                return Redirect("/Posts/Show/" + p.PostId);
-            }
-
-            else
-            {
-                TempData["message"] = "You cannot unlike this post";
-                return RedirectToAction("Index", "Posts");
             }
         }
     }
