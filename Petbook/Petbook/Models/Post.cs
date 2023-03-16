@@ -8,6 +8,7 @@ namespace Petbook.Models
     {
         [Key]
         public int PostId { get; set; }
+        [Required(ErrorMessage = "You have to select a pet")]
         public int? PetId { get; set; }
         public virtual Pet? Pet { get; set; }
 
@@ -19,6 +20,6 @@ namespace Petbook.Models
         public virtual ICollection<PostLike>? PostLikes { get; set; }
 
         [NotMapped]
-        public IEnumerable<SelectListItem> Pets { get; set; }
+        public IEnumerable<SelectListItem>? Pets { get; set; }
     }
 }

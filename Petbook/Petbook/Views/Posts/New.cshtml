@@ -1,5 +1,58 @@
 ﻿@model Petbook.Models.Post
 
+@*this code was taken from this site https://github.com/foliotek/croppie*@
+<style>
+
+input[type="file"] {
+    cursor: pointer;
+}
+button:focus {
+    outline: 0;
+}
+
+.file-btn {
+    position: relative;
+}
+.file-btn input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+}
+
+.upload-demo .upload-demo-wrap,
+.upload-demo .upload-result,
+.upload-demo.ready .upload-msg {
+    display: none;
+}
+.upload-demo.ready .upload-demo-wrap {
+    display: block;
+}
+.upload-demo.ready .upload-result {
+    display: inline-block;    
+}
+.upload-demo-wrap {
+    width: 400px;
+    height: 400px;
+    margin: 10px auto;
+}
+
+.upload-msg {
+    text-align: center;
+    padding: auto;
+    font-size: 22px;
+    color: #aaa;
+    width: 400px;
+    height: 400px;
+    margin: 10px auto;
+    border: 1px solid #aaa;
+}
+
+</style>
+
+
 <div class="container mt-3">
     <div class="row">
         <div class="col-6 offset-3 border" style="border-radius:0.3rem">
@@ -13,8 +66,7 @@
                 </li>
             </ul>
             <br />
-            <br />
-            
+             
             @using (Html.BeginForm(actionName: "New", controllerName: "Posts", method: FormMethod.Post))
             {
                 <div class="form-group">
@@ -24,10 +76,23 @@
                     @Html.ValidationMessageFor(model => model.PetId, null, new { @class = "text-danger" })
                 </div>
                 <br />
-                <br />
+
                 <div class="form-group">
                     @Html.LabelFor(model => model.PostPhoto, " Upload an image", new { @class = "control-label" })
-                    @Html.TextBoxFor(model => model.PostPhoto, new { @class = "form-control" })
+
+                    <div class="demo-wrap upload-demo">
+                        <div id="upload_button">
+                            <a class="btn file-btn upload-msg" style="display: flex; align-items: center; justify-content: center;">
+                                <span>Upload an image to start cropping</span>
+                                <input type="file" id="upload" value="Choose a file" accept="image/*" />
+                            </a>
+                        </div>
+                        <div class="upload-demo-wrap">
+                            <div id="upload-demo"></div>
+                        </div>    
+                    </div>
+                    
+                    <input id="photob64" type="text" style="display: none" asp-for="PostPhoto"></input>
                     @Html.ValidationMessageFor(model => model.PostPhoto, null, new { @class = "text-danger" })
                 </div>
                 <br />
@@ -39,12 +104,66 @@
                 </div>
                 
                 <div class="form-group mt-4">
-                    <input type="submit" value="Share" class="btn btn-primary"  style="float: right"/>
+                    <input type="submit" value="Share" class="btn btn-primary upload-result" style="float: right" />
                 </div>
                 <br />
                 <br />
                 <br />
-             }
+            }
+            
         </div>
     </div>
 </div>
+
+@*this code was taken from this site https://github.com/foliotek/croppie*@
+<script>
+
+    var $uploadCrop;
+
+    function readFile(input) {
+        console.log("readFile");
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('.upload-demo').addClass('ready');
+                $uploadCrop.croppie('bind', {
+                    url: e.target.result
+                }).then(function () {
+                    console.log('jQuery bind complete');
+                });
+
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+        else {
+            swal("Sorry - you're browser doesn't support the FileReader API");
+        }
+    }
+
+    $uploadCrop = $('#upload-demo').croppie({
+        viewport: {
+            width: 400,
+            height: 400,
+            type: 'square'
+        },
+        enableExif: true
+    });
+
+    $('#upload').on('change', function () {
+        readFile(this);
+        $('#upload_button').css('display', 'none');
+    });
+    $('.upload-result').on('click', function (ev) {
+        $uploadCrop.croppie('result', {
+            type: 'canvas',
+            size: 'viewport'
+        }).then(function (resp) {
+            if (resp != "data:,") { // this means that the user did not select a photo
+                $('#photob64').val(resp);
+            }
+        });
+    });
+
+</script>
