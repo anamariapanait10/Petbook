@@ -39,32 +39,32 @@ namespace Petbook.Controllers
 
         [HttpPost]
         [Authorize(Roles = "User,Admin")]
-        public IActionResult New(int blogPostId)
+        public IActionResult New(int commentId)
         {
-            var blogPostLike = new BlogPostLike();
-            blogPostLike.UserId = _userManager.GetUserId(User);
-            blogPostLike.BlogPostId = blogPostId;
-            db.BlogPostLikes.Add(blogPostLike);
+            var commentLike = new CommentLike();
+            commentLike.UserId = _userManager.GetUserId(User);
+            commentLike.CommentId = commentId;
+            db.CommentLikes.Add(commentLike);
             db.SaveChanges();
 
-            return RedirectToAction("BlogPosts", "Index");
+            return RedirectToAction("Comments/Show/" + commentId);
         }
 
         [HttpPost]
         [Authorize(Roles = "User,Admin")]
-        public IActionResult Delete(int blogPostId)
+        public IActionResult Delete(int commentId)
         {
-            var blogPostLikes = db.BlogPostLikes
-                               .Where(bpl => bpl.BlogPostId == blogPostId &&
+            var commentLike = db.CommentLikes
+                               .Where(bpl => bpl.CommentId == commentId &&
                                bpl.UserId == _userManager.GetUserId(User))
-                               .ToList();
-            if (blogPostLikes != null)
+                               .FirstOrDefault();
+            if (commentLike != null)
             {
-                db.Remove(blogPostLikes);
+                db.Remove(commentLike);
                 db.SaveChanges();
             }
 
-            return RedirectToAction("BlogPosts", "Index");
+            return RedirectToAction("Comments/Show/" + commentId);
         }
     }
 }
