@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Petbook.Migrations
 {
-    public partial class migratie2 : Migration
+    public partial class migration1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -31,7 +31,6 @@ namespace Petbook.Migrations
                     JoinDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ProfilePhoto = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -49,11 +48,6 @@ namespace Petbook.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -88,6 +82,29 @@ namespace Petbook.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ApplicationUserApplicationUser",
+                columns: table => new
+                {
+                    FollowersId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FollowingId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApplicationUserApplicationUser", x => new { x.FollowersId, x.FollowingId });
+                    table.ForeignKey(
+                        name: "FK_ApplicationUserApplicationUser_AspNetUsers_FollowersId",
+                        column: x => x.FollowersId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ApplicationUserApplicationUser_AspNetUsers_FollowingId",
+                        column: x => x.FollowingId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -202,6 +219,7 @@ namespace Petbook.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     PetName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    PetPhoto = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Category = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Location = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -362,6 +380,11 @@ namespace Petbook.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUserApplicationUser_FollowingId",
+                table: "ApplicationUserApplicationUser",
+                column: "FollowingId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 column: "RoleId");
@@ -392,11 +415,6 @@ namespace Petbook.Migrations
                 name: "EmailIndex",
                 table: "AspNetUsers",
                 column: "NormalizedEmail");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_ApplicationUserId",
-                table: "AspNetUsers",
-                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
@@ -458,6 +476,9 @@ namespace Petbook.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "ApplicationUserApplicationUser");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 

@@ -22,6 +22,21 @@ namespace Petbook.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("ApplicationUserApplicationUser", b =>
+                {
+                    b.Property<string>("FollowersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FollowingId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("FollowersId", "FollowingId");
+
+                    b.HasIndex("FollowingId");
+
+                    b.ToTable("ApplicationUserApplicationUser");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -167,9 +182,6 @@ namespace Petbook.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -222,8 +234,6 @@ namespace Petbook.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -365,6 +375,9 @@ namespace Petbook.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
+                    b.Property<string>("PetPhoto")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
@@ -436,6 +449,21 @@ namespace Petbook.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("ApplicationUserApplicationUser", b =>
+                {
+                    b.HasOne("Petbook.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("FollowersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Petbook.Models.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("FollowingId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -485,13 +513,6 @@ namespace Petbook.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Petbook.Models.ApplicationUser", b =>
-                {
-                    b.HasOne("Petbook.Models.ApplicationUser", null)
-                        .WithMany("Followers")
-                        .HasForeignKey("ApplicationUserId");
                 });
 
             modelBuilder.Entity("Petbook.Models.BlogPost", b =>
@@ -617,8 +638,6 @@ namespace Petbook.Migrations
                     b.Navigation("BlogPosts");
 
                     b.Navigation("Comments");
-
-                    b.Navigation("Followers");
 
                     b.Navigation("Pets");
                 });

@@ -41,10 +41,8 @@ namespace Petbook.Controllers
 
         public async Task<ActionResult> Show(string id )
         {
-            ApplicationUser user = db.ApplicationUsers.Include("Followers").Where(u=>u.Id==id).First();
-            var roles = await _userManager.GetRolesAsync(user);
-            
-            ViewBag.Roles = roles;
+            ApplicationUser user = db.ApplicationUsers.Include("Followers").Include("Following").Include("Pets").Where(u=>u.Id==id).First();
+            var roles = await _userManager.GetRolesAsync(user); 
 
             return View(user);
         }

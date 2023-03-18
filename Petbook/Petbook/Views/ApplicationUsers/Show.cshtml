@@ -7,16 +7,18 @@
         <div>
             <p><i class="bi"> </i>@Model.UserName</p>
 
-            <p><i class="bi bi-envelope"></i> Followers: @Model.Followers.Count</p>
+            <p><i class="bi"></i> Followers: @Model.Followers.Count</p>
 
-            @if (ViewBag.Roles.Count > 0)
+            <p><i class="bi"></i> Followers: @Model.Following.Count</p>
+
+            @*@if (ViewBag.Roles.Count > 0)
             {
                 <p><i class="bi bi-person"> </i> Roluri utilizator:</p>
                 @foreach (var role in ViewBag.Roles)
                 {
                     <span class="rounded-pill bg-dark mr-2 px-4 py-2 text-white">@role</span>
                 }
-            }
+            }*@
 
 
 
@@ -41,10 +43,30 @@
                 }
             }
         </div>*@
+
        
     </div>
 </div>
-
+<div >
+    <h3>Your pets: @Model.Pets.Count</h3>
+        <div class="d-flex flex-column justify-content-between">
+            
+            @for(int i = 0; i < @Model.Pets.Count;i+=3){
+            <div class="d-flex flex-row justify-content-between p-2">
+                @for(int j = i; j < i+3 && j<@Model.Pets.Count; j++)
+                {
+                    <div>
+                        <a href="/Pets/Show/"+@Model.Pets[j].PetId><img src=@Model.Pets[j].PetPhoto style="width: 300px; height:300px"></a>
+                        
+                        
+                    </div>
+                    
+                }
+                
+               </div>
+            }
+        </div>
+</div>
 
 
 
