@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Petbook";
+}
+
+@if (ViewBag.Message != null)
+{
+    <h2 class="alert-success p-3 rounded-3 text-center mb-5">@ViewBag.Message</h2>
+}
+
+<br />
+
+
+@foreach (Petbook.Models.Post post in ViewBag.ExplorePosts)
+{
+    <div class="card" style="width:600px; margin:auto; text-align:center">
+        @Html.Partial("PostInfo", post )
+
+    </div>
+    <br />
+    <br />
+}
