@@ -25,6 +25,23 @@ namespace Petbook.Controllers
             _roleManager = roleManager;
         }
 
+        [Authorize(Roles = "User,Admin")]
+        [HttpPost("PostLikes/IsLikedByCurrentUser/{postId}")]
+        public ActionResult<string> IsLikedByCurrentUser(int postId)
+        {
+            var postlike = db.PostLikes
+                           .Where(p => p.PostId == postId && p.UserId == _userManager.GetUserId(User))
+                           .FirstOrDefault();
+            if (postlike == null)
+            {
+                return Ok("Yes");
+            }
+            else
+            {
+                return Ok("No");
+            }
+        }
+
         // add a like for a post in the db
         [Authorize(Roles = "User,Admin")]
         [HttpPost("PostLikes/AddLike/{postId}")]
