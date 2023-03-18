@@ -145,6 +145,73 @@ namespace Petbook.Models
                     }
                 }
 
+                //create and insert one blog post for each user in the db
+               
+                foreach (var user in context.Users)
+                {
+                    int indx = 0;
+                    context.BlogPosts.Add(
+                        new BlogPost
+                        {
+                            BlogPostTitle = "Blog post " + indx++,
+                            BlogPostContent = "This is a new blog post belonging to " + user.UserName,
+                            UserId = user.Id
+                        }
+                    
+                    );
+                }
+
+                //add some tags
+                context.Tags.Add(
+                        new Tag
+                        {
+                            TagName = "#fluffypets"
+                        }
+
+                    );
+
+                context.Tags.Add(
+                     new Tag
+                     {
+                         TagName = "#cats"
+                     }
+                 );
+
+                context.Tags.Add(
+                     new Tag
+                     {
+                         TagName = "#dogs"
+                     }
+                 );
+
+                context.Tags.Add(
+                     new Tag
+                     {
+                         TagName = "#hamster"
+                     }
+                 );
+
+                context.Tags.Add(
+                     new Tag
+                     {
+                         TagName = "#unusualpets"
+                     }
+                 );
+
+                context.Tags.Add(
+                     new Tag
+                     {
+                         TagName = "#mypet"
+                     }
+                 );
+
+                context.Tags.Add(
+                     new Tag
+                     {
+                         TagName = "#parrots"
+                     }
+                 );
+
                 context.SaveChanges();
             }
         }

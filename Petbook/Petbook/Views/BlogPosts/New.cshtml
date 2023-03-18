@@ -1,4 +1,61 @@
-﻿
+﻿@model Petbook.Models.BlogPost
+
+<style>
+    input[type="file"] {
+        cursor: pointer;
+    }
+
+    button:focus {
+        outline: 0;
+    }
+
+    .file-btn {
+        position: relative;
+    }
+
+        .file-btn input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+    .upload-demo .upload-demo-wrap,
+    .upload-demo .upload-result,
+    .upload-demo.ready .upload-msg {
+        display: none;
+    }
+
+    .upload-demo.ready .upload-demo-wrap {
+        display: block;
+    }
+
+    .upload-demo.ready .upload-result {
+        display: inline-block;
+    }
+
+    .upload-demo-wrap {
+        width: 400px;
+        height: 400px;
+        margin: 10px auto;
+    }
+
+    .upload-msg {
+        text-align: center;
+        padding: auto;
+        font-size: 22px;
+        color: #aaa;
+        width: 400px;
+        height: 400px;
+        margin: 10px auto;
+        border: 1px solid #aaa;
+    }
+
+</style>
+
+
 <div class="container mt-3">
     <div class="row">
         <div class="col-6 offset-3 border" style="border-radius:0.3rem">
@@ -11,8 +68,41 @@
                     <a class="nav-link active" href="/BlogPosts/New">Create a new blog post</a>
                 </li>
             </ul>
+            <br/>
+            @using (Html.BeginForm(actionName: "New", controllerName: "BlogPosts", method: FormMethod.Post))
+            {
+                @Html.Label("BlogPostTitle", "Blog post title")
+                <br />
+                @Html.TextBox("BlogPostTitle", null, new { @class = "form-control" })
 
-            <label>Create blog post</label>
+                <br />
+
+                <br />
+                @Html.Label("BlogPostContent", "Content")
+                <br />
+                @Html.TextArea("BlogPostContent", null, new { @class = "summernote" })
+
+                @Html.ValidationMessage("BlogPostContent", null, new { @class = "text-danger" })
+                <br />
+                <br />
+                /////
+                @Html.Label("BlogPostTags", "Your tags")
+                <br/>
+                <input list="blogposttags" name="tag" id="tag">
+                <datalist id="tags">
+
+                    @foreach (var tag in ViewBag.Tags)
+                    {
+                        <option value=@tag.TagId>@tag.TagName</option>
+                    }
+          
+                </datalist>
+
+                <br/>
+                <button class="btn btn-primary upload-result" style="float: right" type="submit">Share</button>
+                <br/>
+                <br/>
+            }
         </div>
     </div>
 </div>

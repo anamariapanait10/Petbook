@@ -22,7 +22,6 @@ namespace Petbook.Controllers
             _roleManager = roleManager;
         }
 
-
         [HttpPost]
         public IActionResult New(BlogPostTag requestBlogPostTag)
         {
@@ -40,7 +39,8 @@ namespace Petbook.Controllers
                 db.SaveChanges();
                 TempData["message"] = "The tag was assigned to the blog post.";
             }
-
+            var tags = db.Tags.ToList();
+            ViewBag.Tags = tags;
             return Redirect("/BlogPosts/Show/" + requestBlogPostTag.BlogPostId);
         }
 

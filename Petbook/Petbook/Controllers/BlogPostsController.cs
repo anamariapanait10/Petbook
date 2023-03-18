@@ -30,6 +30,8 @@ namespace Petbook.Controllers
             if (User.IsInRole("User"))
             {
                 var blogPosts = db.BlogPosts.Include("User")
+                                            .Include("BlogPostTags")
+                                            .Include("BlogPostLikes")
                               .Where(b => b.UserId == _userManager.GetUserId(User))
                               .ToList();
                 ViewBag.BlogPosts = blogPosts;
@@ -39,7 +41,9 @@ namespace Petbook.Controllers
             {
                 //the admin can see the blog posts of all users
                 var blogPosts = db.BlogPosts.Include("User")
-                                .ToList();
+                                            .Include("BlogPostTags")
+                                            .Include("BlogPostLikes")
+                                            .ToList();
                 ViewBag.BlogPosts = blogPosts;
                 return View();
             }
@@ -61,7 +65,7 @@ namespace Petbook.Controllers
                     TempData["message"] = "The blog post doesn't exist";
                     return RedirectToAction("Index", "BlogPosts");
                 }
-
+                                  
                 return View(blogPosts);
             }
             else
@@ -86,6 +90,8 @@ namespace Petbook.Controllers
         [Authorize(Roles = "User,Admin")]
         public IActionResult New()
         {
+            var tags = db.Tags.ToList();
+            ViewBag.Tags = tags;
             BlogPost bp = new BlogPost();
             return View(bp);
         }

@@ -1,0 +1,12 @@
+﻿@model Petbook.Models.BlogPost
+
+<div class="container mt-3">
+    @Html.Partial("BlogPostInfo", Model)
+
+    @foreach(var tag in Model.BlogPostTags)
+    {
+        <div style="border-radius: 10px; background: beige; padding: 10px;">@tag.Tag.TagName</div>
+        <br/>
+    }
+</div>
+

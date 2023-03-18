@@ -159,7 +159,7 @@ namespace Petbook.Controllers
             {
                 if (post.Pet.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
                 {   
-                    post.Photo = requestPost.Photo;
+                    post.PostPhoto = requestPost.PostPhoto;
                     post.Description = requestPost.Description;
                     post.PostDate = requestPost.PostDate;
                     TempData["message"] = "The post has been modified";
