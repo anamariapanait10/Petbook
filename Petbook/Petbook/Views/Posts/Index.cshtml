@@ -20,10 +20,11 @@
         </ul>
     </div>
     <br />
+    <br />
 
     @foreach (Petbook.Models.Post post in ViewBag.Posts)
     {
-        <div class="card" style="width: 30vw; margin:auto; text-align:center">
+        <div class="card" id="postcard-@post.PostId" style="width: 30vw; margin:auto; text-align:center">
             @Html.Partial("PostInfo", post )
         
         </div>

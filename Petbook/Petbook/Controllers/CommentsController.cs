@@ -25,21 +25,21 @@ namespace Petbook.Controllers
             _roleManager = roleManager;
         }
 
-        [HttpPost]
+        [HttpPost("Comments/New")]
         [Authorize(Roles = "User,Admin")]
-        public IActionResult New(Comment comment)
+        public IActionResult New([FromBody] Comment comment)
         {
-
+            comment.CommentDate = DateTime.Now;
+            comment.UserId = _userManager.GetUserId(User);
             if (ModelState.IsValid)
             {
                 db.Comments.Add(comment);
                 db.SaveChanges();
-                return Redirect("/Posts/Show/" + comment.PostId);
+                return Ok("Comment added");
             }
-
             else
             {
-                return Redirect("/Posts/Show/" + comment.PostId);
+                return BadRequest();
             }
         }
 

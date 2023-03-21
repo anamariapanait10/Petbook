@@ -1,55 +1,99 @@
 ﻿@model Petbook.Models.Post
 
+<style>
+    /* width */
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px lightgrey;
+        border-radius: 1px;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: darkgray;
+        border-radius: 1px;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: gray;
+    }
+</style>
+
 <div class="card-body" style="background-color:#f7f7f2; padding: 0">
-
-    @*TODO: use PetPhoto insead (#EECD7A;)*@
-    <div class="d-flex col rounded-top" style="background-color: #eab676; width: calc(30vw - 2px); margin:auto">
-        <div class="d-flex row text-lg-start">
-            <div class="d-flex col">
-                <img style="width:55px; height:55px" class="rounded-circle px-2 py-2" src=@Model.PostPhoto alt="No photo">
-                <span class="card-title d-block mt-2" style="font-size: 22px; font-weight: 400"><b>@Model.Pet.PetName</b></span>
+    <div class="row">
+        <div id="postdiv-@Model.PostId">
+            @*TODO: use PetPhoto insead (#EECD7A;)*@
+            <div class="d-flex col rounded-top" style="background-color: #eab676; width: 100%; margin:auto">
+                <div class="d-flex row text-lg-start">
+                    <div class="d-flex col">
+                        <img style="width:55px; height:55px" class="rounded-circle px-2 py-2" src=@Model.PostPhoto alt="No photo">
+                        <span class="card-title d-block mt-2" style="font-size: 22px; font-weight: 400"><b>@Model.Pet.PetName</b></span>
+                    </div>
+                    <span class="card-subtitle d-block mx-2 mb-1" style="font-size: 14px; font-weight: 200">~ owned by @Model.Pet.User.UserName ~</span>
+                </div>
             </div>
-            <span class="card-subtitle d-block mx-2 mb-1" style="font-size: 14px; font-weight: 200">~ owned by @Model.Pet.User.UserName ~</span>
+
+            <img class="w-100" src=@Model.PostPhoto alt="No photo">
+
+            <div class="d-flex justify-content-between row">
+                <div class="d-flex col justify-content-left mx-2 my-1">
+                    <span id="like-btn-@Model.PostId">
+                        <i id="like-btn-icon-@Model.PostId" class="bi bi-hand-thumbs-up" style="font-size: 1.4rem"></i></a>
+                        <span id="like-count-@Model.PostId">@Model.PostLikes.Count</span>
+                    </span>
+                    <span id="comm-btn-@Model.PostId" type="button" class="mx-3"><i class="bi bi-chat" style="font-size: 1.4rem"></i></span>
+                </div>
+                <br />
+                <div class="m-2" style="text-align:left">
+                    <i class="bi bi-blockquote-left mt-5" style="font-size: 1rem"></i>
+                    <span class="mb-1" style="text-align:left; margin-top:0px; font-size: 1.1rem">@Model.Description</span>
+                </div>
+                <br />
+                <br />
+                <div id="comment-input-@Model.PostId" class="d-flex justify-content-center col">
+                    <input name="CommentContent-@Model.PostId" class="form-control" style="border-radius: 0 0 0 3px; border-bottom-color: white" placeholder="Add a comment" />
+                    <button onclick="addComment(@Model.PostId)" class="btn text-right" type="submit" style="background-color: #eab676; border-radius: 0 0 3px 0" type="submit">Post</button>
+                   
+                </div>
+            </div>
+        </div>
+        <div id="comment-section-@Model.PostId" class="col-6" style="display: none;">
+            <div id="comments-div-@Model.PostId">
+                <h5 style="color: gray" class="mt-1">Comments</h5>
+                <hr class="mx-2 mb-0" />
+            </div>
+            <div id="comments-scroll-@Model.PostId" style="overflow-y: auto; overflow-x:clip;">
+                @foreach (Petbook.Models.Comment comm in @Model.Comments)
+                {
+                    <div class="d-flex">
+                        <img style="width:55px; height:55px" class="rounded-circle px-2 py-2 align-content-start" src=@Model.PostPhoto alt="No photo">
+                        <p style="vertical-align: middle; margin: auto auto auto 0; text-align:left">@comm.CommentContent</p>
+                    </div>
+                }
+            </div>
+            
         </div>
     </div>
-
-    <img style="width:calc(30vw - 2px)" src=@Model.PostPhoto alt="No photo">
-
-    <div class="d-flex justify-content-between row">
-        <div class="d-flex col justify-content-left mx-2 my-1">
-            <span id="like-btn-@Model.PostId"><i id="like-btn-icon-@Model.PostId" class="bi bi-hand-thumbs-up" style="font-size: 1.4rem"></i></a> 
-                <span id="like-count-@Model.PostId">@Model.PostLikes.Count</span>
-            </span>
-            <span class="mx-3"><i class="bi bi-chat" style="font-size: 1.4rem"></i></span>
-        </div>
-        <br />
-        <div class="m-2" style="text-align:left">
-            <i class="bi bi-blockquote-left mt-5" style="font-size: 1rem"></i> 
-            <span class="mb-1" style="text-align:left; margin-top:0px; font-size: 1.1rem">@Model.Description</span>
-        </div>
-        <br />
-        <br />
-        <div class="d-flex justify-content-center col">
-            <input class="form-control" style="border-radius: 0 0 0 3px; border-left-color: white; border-bottom-color: white" placeholder="Add a comment"/>
-            <button class="btn text-right" style="background-color: #eab676; border-radius: 0 0 3px 0" type="submit">Post</button>
-        </div>
-    </div>
-
+        
 </div>
 
 <script>
     var likesCount_@Model.PostId = @Model.PostLikes.Count;
+
     $('#like-btn-' + @Model.PostId).on('click', function (ev) {
         $.post("/PostLikes/AddLike/" + @Model.PostId, null, function(data, status) {
             if(status == "success") {
                 if (data == "Post with id " + @Model.PostId + " liked") {
-                    console.log(data);
                     likesCount_@Model.PostId ++;
                     $('#like-btn-icon-' + @Model.PostId).removeClass("bi-hand-thumbs-up");
                     $('#like-btn-icon-' + @Model.PostId).addClass("bi-hand-thumbs-up-fill");
                     $('#like-btn-icon-' + @Model.PostId).css("color", "#EECD7A");
                 } else {
-                    console.log(data);
                     likesCount_@Model.PostId --;
                     $('#like-btn-icon-' + @Model.PostId).removeClass("bi-hand-thumbs-up-fill");
                     $('#like-btn-icon-' + @Model.PostId).addClass("bi-hand-thumbs-up");
@@ -63,4 +107,76 @@
         });
         
     });
+    $(document).ready(function () {
+        $.post("/PostLikes/IsLikedByCurrentUser/" + @Model.PostId, null, function (data, status) {
+            if (status == "success") {
+                    if (data == "Yes") {
+                        $('#like-btn-icon-' + @Model.PostId).removeClass("bi-hand-thumbs-up-fill");
+                        $('#like-btn-icon-' + @Model.PostId).addClass("bi-hand-thumbs-up");
+                        $('#like-btn-icon-' + @Model.PostId).css("color", "black");
+                    } else {    
+                        $('#like-btn-icon-' + @Model.PostId).removeClass("bi-hand-thumbs-up");
+                        $('#like-btn-icon-' + @Model.PostId).addClass("bi-hand-thumbs-up-fill");
+                        $('#like-btn-icon-' + @Model.PostId).css("color", "#EECD7A");
+                    }
+            }
+        });
+    });
+
+    $('#comm-btn-' + @Model.PostId).on('click', function (ev) {
+        var cs = $('#comment-section-' + @Model.PostId);
+        var p = $('#postdiv-' + @Model.PostId);
+        var pcard = $('#postcard-' + @Model.PostId);
+        var ci = $('#comment-input-' +@Model.PostId);
+        var commentsScroll = $('#comments-scroll-' +@Model.PostId);
+        var commentsDiv = $('#comments-div-'+@Model.PostId);
+        cs.css('max-height', p.css('height'));
+
+        var p_height = parseInt(p.css('height').substring(0, p.css('height').length - 2));
+        var ci_height = parseInt(ci.css('height').substring(0, ci.css('height').length - 2));
+        var cd_height = parseInt(commentsDiv.css('height').substring(0, commentsDiv.css('height').length - 2));
+        commentsScroll.css('max-height', '100%'); @*String(p_height - ci_height - cd_height - 50) + 'px');*@
+        cs.toggle();
+        
+        if (cs.css('display') == 'none') {
+            p.removeClass("col-6");
+            pcard.css('width', '30vw');
+            ci.css('transform', 'translateX(0)');
+        } else {
+            p.addClass("col-6");
+            pcard.css('width', '62vw');
+            ci.css('transform', 'translateX(32vw)');
+        }
+
+    });
+    
+    function addComment(postId) {
+        var commentContent = $("input[name='CommentContent-" + @Model.PostId + "']").val();
+
+        $.ajax({
+            url: "/Comments/New",
+            type: "POST",
+            data: JSON.stringify({ CommentContent: commentContent, PostId: postId }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function () {
+                console.log("Comment added");
+            },
+            error: function(e) {
+                console.log(e);
+            }
+        });
+    }
+
+
 </script>
+
+@*
+
+$('#comment-section-' + @Model.PostId).prepend(
+                    "<div> new div </div>"
+                    "<div class='d-flex'><img style='width:55px; height:55px' class='rounded-circle px-2 py-2 align-content-start' src="
+                        + @Model.PostPhoto + "><p style='vertical-align: middle; margin: auto auto auto 0; text-align:left'>"
+                        + commentContent + "< /p> < /div>"
+                );
+*@
