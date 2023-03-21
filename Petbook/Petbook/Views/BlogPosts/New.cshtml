@@ -88,12 +88,12 @@
                 /////
                 @Html.Label("BlogPostTags", "Your tags")
                 <br/>
-                <input list="blogposttags" name="tag" id="tag">
-                <datalist id="tags">
+                <input list="blogposttags1" name="tag1" id="tag1" multiple>
+                <datalist id="blogposttags1" separator=",">
 
                     @foreach (var tag in ViewBag.Tags)
                     {
-                        <option value=@tag.TagId>@tag.TagName</option>
+                        <option value=@tag.TagName id="@tag.TagId"></option>
                     }
           
                 </datalist>

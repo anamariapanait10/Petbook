@@ -57,6 +57,7 @@ namespace Petbook.Controllers
                 var blogPosts = db.BlogPosts
                                   .Include("BlogPostLikes")
                                   .Include("BlogPostTags")
+                                  .Include("BlogPostTags.Tag")
                                   .Include("User")
                                   .Where(b => b.BlogPostId == id)
                                   .FirstOrDefault();
@@ -98,7 +99,7 @@ namespace Petbook.Controllers
 
         [HttpPost]
         [Authorize(Roles = "User,Admin")]
-        public ActionResult New(BlogPost bp)
+        public ActionResult New(BlogPost bp, [FromForm]string tag1)
         {
             bp.UserId = _userManager.GetUserId(User);
 
@@ -106,7 +107,15 @@ namespace Petbook.Controllers
             {
                 db.BlogPosts.Add(bp);
                 db.SaveChanges();
+
+                BlogPostTag bpt = new BlogPostTag();
+                bpt.BlogPostId = bp.BlogPostId;
+                bpt.TagId = 1;
+                db.BlogPostTags.Add(bpt);
+                db.SaveChanges();
+
                 TempData["message"] = "The blog post was added.";
+
                 return RedirectToAction("Index");
             }
 
