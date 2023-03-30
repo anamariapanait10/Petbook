@@ -25,6 +25,22 @@ namespace Petbook.Controllers
             _roleManager = roleManager;
         }
 
+        [HttpPost("BlogPostLikes/IsLikedByCurrentUser/{blogPostId}")]
+        public ActionResult<string> IsLikedByCurrentUser(int blogPostId)
+        {
+            var blogPostlike = db.BlogPostLikes
+                           .Where(p => p.BlogPostId == blogPostId && p.UserId == _userManager.GetUserId(User))
+                           .FirstOrDefault();
+            if (blogPostlike == null)
+            {
+                return Ok("Yes");
+            }
+            else
+            {
+                return Ok("No");
+            }
+        }
+
         [Authorize(Roles = "User,Admin")]
         public IActionResult Index(int blogPostId)
         {
@@ -38,34 +54,44 @@ namespace Petbook.Controllers
             return View();
         }
 
-        [HttpPost]
         [Authorize(Roles = "User,Admin")]
-        public IActionResult New(int blogPostId)
+        [HttpPost("BlogPostLikes/New/{id}")]
+        public IActionResult New(int id)
         {
-            var blogPostLike = new BlogPostLike();
-            blogPostLike.UserId = _userManager.GetUserId(User);
-            blogPostLike.BlogPostId = blogPostId;
-            db.BlogPostLikes.Add(blogPostLike);
-            db.SaveChanges();
+            var blogPostLike = db.BlogPostLikes
+                           .Where(bp => bp.BlogPostId == id && bp.UserId == _userManager.GetUserId(User))
+                           .FirstOrDefault();
 
-            return RedirectToAction("BlogPosts", "Index");
+            if (blogPostLike == null)
+            {
+                var like = new BlogPostLike();
+                like.UserId = _userManager.GetUserId(User);
+                like.BlogPostId = id;
+                db.BlogPostLikes.Add(like);
+                db.SaveChanges();
+                return Ok("Blog post with id " + id + " liked");
+            }
+            else
+            {
+                DeleteLike(id);
+                return Ok("Blog post with id " + id + " unliked");
+            }
+            
+            //return RedirectToAction("BlogPosts", "Index");
         }
 
         [HttpPost]
         [Authorize(Roles = "User,Admin")]
-        public IActionResult Delete(int blogPostId)
+        private void DeleteLike(int blogPostId)
         {
-            var blogPostLikes = db.BlogPostLikes
-                               .Where(bpl => bpl.BlogPostId == blogPostId &&
-                               bpl.UserId == _userManager.GetUserId(User))
-                               .ToList();
-            if(blogPostLikes != null)
+            var blogPostLike = db.BlogPostLikes
+                           .Where(p => p.BlogPostId == blogPostId && p.UserId == _userManager.GetUserId(User))
+                           .FirstOrDefault();
+            if (blogPostLike != null)
             {
-                db.Remove(blogPostLikes);
+                db.Remove(blogPostLike);
                 db.SaveChanges();
             }
-
-            return RedirectToAction("BlogPosts", "Index");
         }
     }
 }

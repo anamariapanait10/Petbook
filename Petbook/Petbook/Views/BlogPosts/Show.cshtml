@@ -1,12 +1,35 @@
-﻿@model Petbook.Models.BlogPost
+﻿<style>
+    .btn-secondary {
+        border-color: #0d6efd;
+        background-color: white;
+        color: #0d6efd;
+        line-height: 1;
+        width: 60px;
+        float: right;
+    }
+
+    .btn-danger1{
+
+    }
+</style>
+
+@model Petbook.Models.BlogPost
 
 <div class="container mt-3">
     @Html.Partial("BlogPostInfo", Model)
+    <br />
+    @Html.Partial("BlogPostTags", Model)
 
-    @foreach(var tag in Model.BlogPostTags)
+
+    @if (Model.UserId == ViewBag.CurrentUser)
     {
-        <div style="border-radius: 10px; background: beige; padding: 10px;">@tag.Tag.TagName</div>
-        <br/>
+        <form method="post" action="/BlogPosts/Delete/@Model.BlogPostId">
+
+            <button class="btn btn-danger" style="float:right; line-height:1;" type="submit">Delete</button>
+
+        </form>
     }
+
+    <a class="btn btn-secondary" href="/BlogPosts/Index" style="width:100px; margin-right:5px;">View all</a>
 </div>
 

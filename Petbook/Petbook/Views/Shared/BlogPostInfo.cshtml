@@ -10,13 +10,117 @@
         height: 30px;
         margin: 10px auto;
     }
+
+    .show-less{
+        white-space:nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 400px;
+    }
+
+    .owner {
+        text-align: left;
+        opacity: 0.5;
+        font-size: 12px;
+        <style>
+        /* width */
+        ::-webkit-scrollbar
+
+    {
+        width: 6px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px lightgrey;
+        border-radius: 1px;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: darkgray;
+        border-radius: 1px;
+    }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: gray;
+        }
 </style>
 
-<div class="card-body">
-    <h3 class="blog-post-title">@Model.BlogPostTitle</h3>
-    <div class="card-text">@Html.Raw(Model.BlogPostContent)</div>
-    <div class="d-flex justify-content-between flex-column mt-5 mx-4">
-        <div> <i class="bi bi-hand-thumbs-up"></i>@Model.BlogPostLikes.Count Likes</div>
-        <br />
+<div class="card-body" style="background-color:#f7f7f2; padding: 0; width:100%; height: 100%">
+    <div class="row" style="--bs-gutter-x: 0rem;">
+        <div class="d-flex col rounded-top" style="background-color: #eab676; width: 20%; margin:auto; align-self:center">
+                <span class="card-title d-block mt-2" style="font-size: 15px; font-weight: 300; text-align:center; width:100%"><b>@Model.BlogPostTitle</b></span>
+                <span class="owner">Posted by @Model.User.UserName</span> 
+        </div>
+        <div class="card-body; width:100%; height:100% ">
+            
+            <div class="m-2" style="text-align:left">
+                <i class="bi bi-list mt-5" style="font-size: 1rem; cursor:pointer" id="show-@Model.BlogPostId" onclick="show('@Model.BlogPostId');"></i>
+                <div class="card-text show-less" id="card-@Model.BlogPostId">@Html.Raw(Model.BlogPostContent)</div>
+            </div>
+            <div class="d-flex justify-content-between flex-column mt-5 mx-4">
+                <span id="like-btn-@Model.BlogPostId">
+                    <i id="like-btn-icon-@Model.BlogPostId" class="bi bi-hand-thumbs-up" style="font-size: 1.4rem"></i></a>
+                    <span id="like-count-@Model.BlogPostId">@Model.BlogPostLikes.Count</span>
+                </span>
+                <br />                
+            </div>
+        </div>
+
     </div>
 </div>
+
+<script>
+    var likesCount_@Model.BlogPostId = @Model.BlogPostLikes.Count;
+
+    $('#like-btn-' + @Model.BlogPostId).on('click', function (ev) {
+        $.post("/BlogPostLikes/New/" + @Model.BlogPostId, null, function (data, status) {
+            if (status == "success") {
+                if (data == "Blog post with id " + @Model.BlogPostId + " liked") {
+                        likesCount_@Model.BlogPostId ++;
+                        $('#like-btn-icon-' + @Model.BlogPostId).removeClass("bi-hand-thumbs-up");
+                        $('#like-btn-icon-' + @Model.BlogPostId).addClass("bi-hand-thumbs-up-fill");
+                        $('#like-btn-icon-' + @Model.BlogPostId).css("color", "#EECD7A");
+                } else {
+                            likesCount_@Model.BlogPostId --;
+                            $('#like-btn-icon-' + @Model.BlogPostId).removeClass("bi-hand-thumbs-up-fill");
+                            $('#like-btn-icon-' + @Model.BlogPostId).addClass("bi-hand-thumbs-up");
+                            $('#like-btn-icon-' + @Model.BlogPostId).css("color", "black");
+                }
+                $('#like-count-' + @Model.BlogPostId).html(likesCount_@Model.BlogPostId);
+            }
+            else {
+                console.log("Error calling like/dislike");
+            }
+        });
+       
+    });
+    $(document).ready(function () {
+        $.post("/BlogPostLikes/IsLikedByCurrentUser/" + @Model.BlogPostId, null, function (data, status) {
+            if (status == "success") {
+                if (data == "Yes") {
+                    $('#like-btn-icon-' + @Model.BlogPostId).removeClass("bi-hand-thumbs-up-fill");
+                    $('#like-btn-icon-' + @Model.BlogPostId).addClass("bi-hand-thumbs-up");
+                    $('#like-btn-icon-' + @Model.BlogPostId).css("color", "black");
+                } else {
+                    $('#like-btn-icon-' + @Model.BlogPostId).removeClass("bi-hand-thumbs-up");
+                    $('#like-btn-icon-' + @Model.BlogPostId).addClass("bi-hand-thumbs-up-fill");
+                    $('#like-btn-icon-' + @Model.BlogPostId).css("color", "#EECD7A");
+                }
+            }
+        });
+    });
+
+   function show (blogPostId) {
+        if($("#card-" + blogPostId).hasClass("show-less"))
+        {
+            $("#card-" + blogPostId).removeClass("show-less");
+        }
+        else
+        {
+            $("#card-" + blogPostId).addClass("show-less");
+        }
+    }
+</script>

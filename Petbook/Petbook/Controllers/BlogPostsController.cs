@@ -25,33 +25,40 @@ namespace Petbook.Controllers
         }
 
         [Authorize(Roles = "User,Admin")]
-        public IActionResult Index()
+        public IActionResult Index(string search)
         {
-            if (User.IsInRole("User"))
-            {
-                var blogPosts = db.BlogPosts.Include("User")
+            var allTags = db.Tags.ToList();
+            ViewBag.Tags = allTags;
+            ViewBag.SearchString = search;
+
+            //changes made so that any user can see all blogposts
+            ViewBag.CurrentUser = _userManager.GetUserId(User);
+            var blogPosts = db.BlogPosts.Include("User")
                                             .Include("BlogPostTags")
-                                            .Include("BlogPostLikes")
-                              .Where(b => b.UserId == _userManager.GetUserId(User))
-                              .ToList();
-                ViewBag.BlogPosts = blogPosts;
-                return View();
-            }
-            else
-            {
-                //the admin can see the blog posts of all users
-                var blogPosts = db.BlogPosts.Include("User")
-                                            .Include("BlogPostTags")
+                                            .Include("BlogPostTags.Tag")
                                             .Include("BlogPostLikes")
                                             .ToList();
-                ViewBag.BlogPosts = blogPosts;
-                return View();
+
+            //filter results based on search keyword
+            if (!string.IsNullOrEmpty(search))
+            {
+                var tagsIds = db.Tags.Where(t => t.TagName.ToLower().Contains(search.ToLower()))
+                            .Select(t => t.TagId).ToList();
+
+                blogPosts = blogPosts.Where(b => b.BlogPostTags.Where(bt => tagsIds.Contains(bt.TagId.Value)).Count() > 0).ToList();
             }
+
+            ViewBag.BlogPosts = blogPosts;
+            return View();
         }
 
         [Authorize(Roles = "User,Admin")]
         public IActionResult Show(int id)
         {
+            var tags = db.Tags.ToList();
+            ViewBag.Tags = tags;
+
+            ViewBag.CurrentUser = _userManager.GetUserId(User);
             if (User.IsInRole("User"))
             {
                 var blogPosts = db.BlogPosts
@@ -61,6 +68,7 @@ namespace Petbook.Controllers
                                   .Include("User")
                                   .Where(b => b.BlogPostId == id)
                                   .FirstOrDefault();
+                
                 if (blogPosts == null)
                 {
                     TempData["message"] = "The blog post doesn't exist";
@@ -94,12 +102,13 @@ namespace Petbook.Controllers
             var tags = db.Tags.ToList();
             ViewBag.Tags = tags;
             BlogPost bp = new BlogPost();
+            ViewBag.CurrentUser = _userManager.GetUserId(User);
             return View(bp);
         }
 
         [HttpPost]
         [Authorize(Roles = "User,Admin")]
-        public ActionResult New(BlogPost bp, [FromForm]string tag1)
+        public ActionResult New(BlogPost bp, [FromForm] string tag1)
         {
             bp.UserId = _userManager.GetUserId(User);
 
@@ -108,11 +117,19 @@ namespace Petbook.Controllers
                 db.BlogPosts.Add(bp);
                 db.SaveChanges();
 
-                BlogPostTag bpt = new BlogPostTag();
-                bpt.BlogPostId = bp.BlogPostId;
-                bpt.TagId = 1;
-                db.BlogPostTags.Add(bpt);
-                db.SaveChanges();
+                if (!string.IsNullOrEmpty(tag1))
+                {
+                    var tags = tag1.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                    var tagIds = db.Tags.Where(t => tags.Contains(t.TagName)).Select(t => t.TagId).ToList();
+                    foreach (var tagId in tagIds)
+                    {
+                        BlogPostTag bpt = new BlogPostTag();
+                        bpt.BlogPostId = bp.BlogPostId;
+                        bpt.TagId = tagId;
+                        db.BlogPostTags.Add(bpt);
+                    }
+                    db.SaveChanges();
+                }
 
                 TempData["message"] = "The blog post was added.";
 
@@ -162,7 +179,7 @@ namespace Petbook.Controllers
         {
 
             BlogPost blogPost = db.BlogPosts.Find(id);
-
+            ViewBag.CurrentUser = _userManager.GetUserId(User);
 
             if (ModelState.IsValid)
             {
@@ -194,6 +211,7 @@ namespace Petbook.Controllers
                                          .Include("BlogPostTags")
                                          .Where(bp => bp.BlogPostId == id)
                                          .FirstOrDefault();
+        ViewBag.CurrentUser = _userManager.GetUserId(User);
             if (blogPost != null)
             {
                 if (blogPost.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
