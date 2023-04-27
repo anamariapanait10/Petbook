@@ -19,17 +19,15 @@
     @Html.Partial("BlogPostInfo", Model)
     <br />
     @Html.Partial("BlogPostTags", Model)
-
+    <br />
 
     @if (Model.UserId == ViewBag.CurrentUser)
     {
         <form method="post" action="/BlogPosts/Delete/@Model.BlogPostId">
 
-            <button class="btn btn-danger" style="float:right; line-height:1;" type="submit">Delete</button>
+            <button class="btn btn-danger" style="float:right;" type="submit">Delete blogpost</button>
 
         </form>
     }
-
-    <a class="btn btn-secondary" href="/BlogPosts/Index" style="width:100px; margin-right:5px;">View all</a>
 </div>
 

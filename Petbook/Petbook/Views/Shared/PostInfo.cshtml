@@ -190,7 +190,6 @@
     function addComment(postId, postPhoto) {
         var commentContent = $('#CommentContent-' + postId).val();
         var btnText = $('#add-comm-btn-' + postId).text();
-        console.log(btnText);
         if (btnText == 'Post'){
             $.ajax({
                 url: "/Comments/New",
@@ -202,6 +201,21 @@
                         postPhoto + "'><p style='vertical-align: middle; margin: auto auto auto 0; text-align:left'>" +
                         commentContent + "</p></div>";
                     $('#comments-scroll-' + postId).append(new_comment);
+                    var s = res.split("&");
+ 
+                    $.post("/Comments/checkIsCurrentUser/"+s[1], null, function (data, status) {
+                        if (status == "success") {
+                            if (data == "Yes") {
+                                console.log(s[0]);
+                                console.log(postId);
+                                var stringHtml = "<i onclick=\"editComment(" + s[0] + "," + postId + ")\" class=\"btn bi bi-pencil\" style=\"color:#2596be\"> </i>" +
+                                    " <i onclick=\"deleteComment(" +s[0] + ")\" class=\"btn bi bi-trash3\" style=\"color:#be4d25\"> </i>";
+                                var ci = $('#comment-icons-' + s[0]);
+                                ci.html(stringHtml);
+                            }
+                        }
+                    });
+                    $('#CommentContent-' + postId).val('');
                 },
                 error: function(e) {
                     console.log(e);
@@ -213,9 +227,11 @@
                 $.post("/Comments/Edit/" + editingCommentId, {commContent: commentContent}, function (data, status) {
                     if (status == "success") {
                         $('#comment-content-' + editingCommentId).html(commentContent);
+                        $('#add-comm-btn-' + postId).html('Post');
+                        $('#CommentContent-' + postId).val('');
+                        editingCommentId = -1;
                     }
-                });
-                $('#add-comm-btn-' + postId).html('Post');
+                });  
             }
         }
     }

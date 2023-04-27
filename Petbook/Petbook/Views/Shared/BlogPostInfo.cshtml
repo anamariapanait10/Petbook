@@ -60,13 +60,19 @@
                 <i class="bi bi-list mt-5" style="font-size: 1rem; cursor:pointer" id="show-@Model.BlogPostId" onclick="show('@Model.BlogPostId');"></i>
                 <div class="card-text show-less" id="card-@Model.BlogPostId">@Html.Raw(Model.BlogPostContent)</div>
             </div>
-            <div class="d-flex justify-content-between flex-column mt-5 mx-4">
+            <div class="d-flex justify-content-between col mt-4 mx-3">
                 <span id="like-btn-@Model.BlogPostId">
                     <i id="like-btn-icon-@Model.BlogPostId" class="bi bi-hand-thumbs-up" style="font-size: 1.4rem"></i></a>
                     <span id="like-count-@Model.BlogPostId">@Model.BlogPostLikes.Count</span>
                 </span>
-                <br />                
-            </div>
+                @if (ViewBag.ShowViewBtn == true){
+                   <a class="btn btn-secondary upload-result" href="/BlogPosts/Show/@Model.BlogPostId">View</a>
+                } else
+                {
+                    <a class="btn btn-secondary" href="/BlogPosts/Index" style="width:100px; margin-right:5px;">View all</a>
+                }
+                </div>
+            <br />
         </div>
 
     </div>
@@ -79,15 +85,15 @@
         $.post("/BlogPostLikes/New/" + @Model.BlogPostId, null, function (data, status) {
             if (status == "success") {
                 if (data == "Blog post with id " + @Model.BlogPostId + " liked") {
-                        likesCount_@Model.BlogPostId ++;
-                        $('#like-btn-icon-' + @Model.BlogPostId).removeClass("bi-hand-thumbs-up");
-                        $('#like-btn-icon-' + @Model.BlogPostId).addClass("bi-hand-thumbs-up-fill");
-                        $('#like-btn-icon-' + @Model.BlogPostId).css("color", "#EECD7A");
+                    likesCount_@Model.BlogPostId ++;
+                    $('#like-btn-icon-' + @Model.BlogPostId).removeClass("bi-hand-thumbs-up");
+                    $('#like-btn-icon-' + @Model.BlogPostId).addClass("bi-hand-thumbs-up-fill");
+                    $('#like-btn-icon-' + @Model.BlogPostId).css("color", "#EECD7A");
                 } else {
-                            likesCount_@Model.BlogPostId --;
-                            $('#like-btn-icon-' + @Model.BlogPostId).removeClass("bi-hand-thumbs-up-fill");
-                            $('#like-btn-icon-' + @Model.BlogPostId).addClass("bi-hand-thumbs-up");
-                            $('#like-btn-icon-' + @Model.BlogPostId).css("color", "black");
+                    likesCount_@Model.BlogPostId --;
+                    $('#like-btn-icon-' + @Model.BlogPostId).removeClass("bi-hand-thumbs-up-fill");
+                    $('#like-btn-icon-' + @Model.BlogPostId).addClass("bi-hand-thumbs-up");
+                    $('#like-btn-icon-' + @Model.BlogPostId).css("color", "black");
                 }
                 $('#like-count-' + @Model.BlogPostId).html(likesCount_@Model.BlogPostId);
             }

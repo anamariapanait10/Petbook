@@ -36,7 +36,7 @@ namespace Petbook.Controllers
             {
                 db.Comments.Add(comment);
                 db.SaveChanges();
-                return Ok("Comment added");
+                return Ok(comment.CommentId + "&" + comment.UserId);
             }
             else
             {
