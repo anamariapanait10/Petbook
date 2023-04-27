@@ -30,6 +30,7 @@ namespace Petbook.Controllers
             var allTags = db.Tags.ToList();
             ViewBag.Tags = allTags;
             ViewBag.SearchString = search;
+            ViewBag.ShowViewBtn = true;
 
             //changes made so that any user can see all blogposts
             ViewBag.CurrentUser = _userManager.GetUserId(User);
@@ -57,7 +58,7 @@ namespace Petbook.Controllers
         {
             var tags = db.Tags.ToList();
             ViewBag.Tags = tags;
-
+            ViewBag.ShowViewBtn = false;
             ViewBag.CurrentUser = _userManager.GetUserId(User);
             if (User.IsInRole("User"))
             {

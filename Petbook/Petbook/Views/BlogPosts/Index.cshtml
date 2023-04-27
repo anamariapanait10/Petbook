@@ -132,20 +132,21 @@
     <div class="card1 blog-card">
 
         @Html.Partial("BlogPostInfo", blogPost)
-        @if (blogPost.BlogPostTags != null)
-        {
-            int i = 0;
-                @foreach (var tag in blogPost.BlogPostTags)
+        <div class="mx-3 mb-1" style="background-color: #f7f7f2">
+            @if (blogPost.BlogPostTags != null)
             {
-                <div class="tag-card tag@(i%5)">
-                    <span id="@tag.TagId" name="@tag.TagId">@tag.Tag.TagName</span>
-                </div>
-                i++;
+                int i = 0;
+                @foreach (var tag in blogPost.BlogPostTags)
+                {
+                    <div class="tag-card tag@(i%5)">
+                        <span id="@tag.TagId" name="@tag.TagId">@tag.Tag.TagName</span>
+                    </div>
+                    i++;
+                }
+                <div style="clear:both"></div>
             }
-            <div style="clear:both"></div>
-        }
-        <a class="btn btn-secondary upload-result" href="/BlogPosts/Show/@blogPost.BlogPostId">View</a>
-        <br/>
+        </div>
+
     </div>
 
     <br />
