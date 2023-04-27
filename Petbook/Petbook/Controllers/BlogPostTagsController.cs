@@ -22,47 +22,69 @@ namespace Petbook.Controllers
             _roleManager = roleManager;
         }
 
-
         [HttpPost]
-        public IActionResult New(BlogPostTag requestBlogPostTag)
+        [Authorize(Roles = "User,Admin")]
+        public IActionResult Save([FromForm] int blogPostId, [FromForm] string tags)
         {
-            if (db.BlogPostTags
-                .Where(bpt => bpt.BlogPostTagId == requestBlogPostTag.BlogPostTagId)
-                .Where(bpt => bpt.BlogPostId == requestBlogPostTag.BlogPostId)
-                .Where(bpt => bpt.TagId == requestBlogPostTag.TagId)
-                .Count() > 0)
+            if (!string.IsNullOrEmpty(tags))
             {
-                TempData["message"] = "This tag already exists for the blog post.";
-            }
-            else
-            {
-                db.BlogPostTags.Add(requestBlogPostTag);
+                //retrieving tags ids based on tags names
+                var newTags = tags.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                var newTagIds = db.Tags
+                                    .Where(t => newTags.Contains(t.TagName))
+                                    .Select(t => t.TagId)
+                                    .ToList();
+                //retrieving existing tags ids associated with the blog post
+                var existingTagIds = db.BlogPostTags
+                                    .Where(t => t.BlogPostId == blogPostId)
+                                    .Select(t => t.TagId)
+                                    .ToList();
+                //adding only tags that are not already associated with the blog post
+                foreach (var tagId in newTagIds)
+                {
+                    if (!existingTagIds.Contains(tagId))
+                    {
+                        BlogPostTag bpt = new BlogPostTag();
+                        bpt.BlogPostId = blogPostId;
+                        bpt.TagId = tagId;
+                        db.BlogPostTags.Add(bpt);
+                    }
+                }
                 db.SaveChanges();
-                TempData["message"] = "The tag was assigned to the blog post.";
             }
 
-            return Redirect("/BlogPosts/Show/" + requestBlogPostTag.BlogPostId);
+            //all available tags added in ViewBag
+            var allTags = db.Tags.ToList();
+            ViewBag.Tags = allTags;
+
+            return Redirect("/BlogPosts/Show/" + blogPostId);
         }
 
 
-        [HttpPost]
-        public IActionResult Delete(BlogPostTag requestBlogPostTag)
+        [Authorize(Roles = "User,Admin")]
+        [HttpPost("BlogPostTags/Delete/{blogPostId}/{tagId}")]
+        public ActionResult<string> Delete(int blogPostId, int tagId)
         {
-            if (db.BlogPostTags
-                .Where(bpt => bpt.BlogPostTagId == requestBlogPostTag.BlogPostTagId)
-                .Where(bpt => bpt.BlogPostId == requestBlogPostTag.BlogPostId)
-                .Where(bpt => bpt.TagId == requestBlogPostTag.TagId)
-                .Count() > 0)
+            //identifying blog post tag
+            var blogPostTag = db.BlogPostTags
+                                .Where(bpt => bpt.BlogPostId == blogPostId)
+                                .Where(bpt => bpt.TagId == tagId)
+                                .FirstOrDefault();
+
+            //removing blog post tag if possible
+            if (blogPostTag != null)
             {
-                db.Remove(requestBlogPostTag);
+                db.Remove(blogPostTag);
                 db.SaveChanges();
+
+                return Ok("Blog post tag deleted");
             }
             else
             {
                 TempData["message"] = "The blog post tag doesn't exist.";
-            }
 
-            return Redirect("/BlogPosts/Show/" + requestBlogPostTag.BlogPostId);
+                return Ok("Blog post tag does not exist");
+            }
         }
     }
 }

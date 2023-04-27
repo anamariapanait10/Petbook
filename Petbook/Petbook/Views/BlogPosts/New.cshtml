@@ -1,4 +1,110 @@
-﻿
+﻿@model Petbook.Models.BlogPost
+
+<style>
+    input[type="file"] {
+        cursor: pointer;
+    }
+
+    button:focus {
+        outline: 0;
+    }
+
+    .file-btn {
+        position: relative;
+    }
+
+        .file-btn input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+    .upload-demo .upload-demo-wrap,
+    .upload-demo .upload-result,
+    .upload-demo.ready .upload-msg {
+        display: none;
+    }
+
+    .upload-demo.ready .upload-demo-wrap {
+        display: block;
+    }
+
+    .upload-demo.ready .upload-result {
+        display: inline-block;
+    }
+
+    .upload-demo-wrap {
+        width: 400px;
+        height: 400px;
+        margin: 10px auto;
+    }
+
+    .upload-msg {
+        text-align: center;
+        padding: auto;
+        font-size: 22px;
+        color: #aaa;
+        width: 400px;
+        height: 400px;
+        margin: 10px auto;
+        border: 1px solid #aaa;
+    }
+
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const separator = ',';
+
+        for (const input of document.getElementsByTagName("input")) {
+            if (!input.multiple) {
+                continue;
+            }
+
+            if (input.list instanceof HTMLDataListElement) {
+                const optionsValues = Array.from(input.list.options).map(opt => opt.value);
+                let valueCount = input.value.split(separator).length;
+
+                input.addEventListener("input", () => {
+                    const currentValueCount = input.value.split(separator).length;
+
+                    // Do not update list if the user doesn't add/remove a separator
+                    // Current value: "a, b, c"; New value: "a, b, cd" => Do not change the list
+                    // Current value: "a, b, c"; New value: "a, b, c," => Update the list
+                    // Current value: "a, b, c"; New value: "a, b" => Update the list
+                    if (valueCount !== currentValueCount) {
+                        const lsIndex = input.value.lastIndexOf(separator);
+                        const str = lsIndex !== -1 ? input.value.substr(0, lsIndex) + separator : "";
+                        filldatalist(input, optionsValues, str);
+                        valueCount = currentValueCount;
+                    }
+                });
+            }
+        }
+
+        function filldatalist(input, optionValues, optionPrefix) {
+            const list = input.list;
+            if (list && optionValues.length > 0) {
+                list.innerHTML = "";
+
+                const usedOptions = optionPrefix.split(separator).map(value => value.trim());
+
+                for (const optionsValue of optionValues) {
+                    if (usedOptions.indexOf(optionsValue) < 0) { // Skip used values
+                        const option = document.createElement("option");
+                        option.value = optionPrefix + optionsValue;
+                        list.append(option);
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+
 <div class="container mt-3">
     <div class="row">
         <div class="col-6 offset-3 border" style="border-radius:0.3rem">
@@ -11,8 +117,41 @@
                     <a class="nav-link active" href="/BlogPosts/New">Create a new blog post</a>
                 </li>
             </ul>
+            <br/>
+            @using (Html.BeginForm(actionName: "New", controllerName: "BlogPosts", method: FormMethod.Post))
+            {
+                @Html.Label("BlogPostTitle", "Blog post title")
+                <br />
+                @Html.TextBox("BlogPostTitle", null, new { @class = "form-control" })
 
-            <label>Create blog post</label>
+                <br />
+
+                <br />
+                @Html.Label("BlogPostContent", "Content")
+                <br />
+                @Html.TextArea("BlogPostContent", null, new { @class = "summernote" })
+
+                @Html.ValidationMessage("BlogPostContent", null, new { @class = "text-danger" })
+                <br />
+                <br />
+                /////
+                @Html.Label("BlogPostTags", "Your tags")
+                <br />
+                <input list="blogposttags1" name="tag1" id="tag1" multiple separator="," type="text">
+                <datalist id="blogposttags1">
+
+                    @foreach (var tag in ViewBag.Tags)
+                    {
+                        <option value=@tag.TagName id="@tag.TagId"></option>
+                    }
+
+                </datalist>
+
+                <br />
+                <button class="btn btn-primary upload-result" style="float: right" type="submit">Share</button>
+                <br />
+                <br />
+            }
         </div>
     </div>
 </div>

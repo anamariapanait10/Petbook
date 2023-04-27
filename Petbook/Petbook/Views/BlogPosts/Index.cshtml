@@ -1,0 +1,154 @@
+﻿<style>
+    .card1 {
+    position: relative;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+}
+
+    input[type="file"] {
+        cursor: pointer;
+    }
+
+    button:focus {
+        outline: 0;
+    }
+
+    .blog-card{
+        left: 25%;
+        width:50%;
+    }
+
+    .file-btn {
+        position: relative;
+    }
+
+        .file-btn input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+    .upload-demo .upload-demo-wrap,
+    .upload-demo .upload-result,
+    .upload-demo.ready .upload-msg {
+        display: none;
+    }
+
+    .upload-demo.ready .upload-demo-wrap {
+        display: block;
+    }
+
+    .upload-demo.ready .upload-result {
+        display: inline-block;
+    }
+
+    .upload-demo-wrap {
+        width: 400px;
+        height: 400px;
+        margin: 10px auto;
+    }
+
+    .upload-msg {
+        text-align: center;
+        padding: auto;
+        font-size: 22px;
+        color: #aaa;
+        width: 400px;
+        height: 400px;
+        margin: 10px auto;
+        border: 1px solid #aaa;
+    }
+
+    .tag-card {
+        display: flex;
+        float: left;
+        margin-right: 10px;
+        padding: 4px;
+        border-radius: 4px;
+        margin-bottom: 5px;
+    }
+
+    .tag0 {
+        background-color: lightskyblue;
+    }
+
+    .tag1 {
+        background-color: lightpink;
+    }
+
+    .tag2 {
+        background-color: lightgreen;
+    }
+
+    .tag3 {
+        background-color: lightgoldenrodyellow;
+    }
+
+    .tag4 {
+        background-color: orange;
+    }
+
+    .btn-secondary {
+        border-color: #0d6efd;
+        background-color:white;
+        color: #0d6efd;
+        line-height:1;
+        width:60px;
+        float:right;
+    }
+
+</style>
+
+<div>
+    <div style="width:600px; margin:auto; text-align:center; width: calc(30vw - 2px);">
+        <ul class="nav nav-tabs mt-3">
+            <li class="nav-item">
+                <a class="nav-link" href="/Posts/Index">Posts</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/BlogPosts/Index">Blog posts</a>
+            </li>
+        </ul>
+    </div>
+    <br />
+    <form method="GET">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search by tags" name="search"
+                   value="@ViewBag.SearchString">
+            <button class="btn btn-primary upload-result" style="float: right" type="submit">Search</button>
+        </div>
+    </form>
+    <br/>
+    <br/>
+@foreach (Petbook.Models.BlogPost blogPost in ViewBag.BlogPosts)
+{
+    <div class="card1 blog-card">
+
+        @Html.Partial("BlogPostInfo", blogPost)
+        @if (blogPost.BlogPostTags != null)
+        {
+            int i = 0;
+                @foreach (var tag in blogPost.BlogPostTags)
+            {
+                <div class="tag-card tag@(i%5)">
+                    <span id="@tag.TagId" name="@tag.TagId">@tag.Tag.TagName</span>
+                </div>
+                i++;
+            }
+            <div style="clear:both"></div>
+        }
+        <a class="btn btn-secondary upload-result" href="/BlogPosts/Show/@blogPost.BlogPostId">View</a>
+        <br/>
+    </div>
+
+    <br />
+    <br />
+}
+</div>

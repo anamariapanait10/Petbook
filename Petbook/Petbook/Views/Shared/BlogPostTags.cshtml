@@ -1,0 +1,153 @@
+﻿@model Petbook.Models.BlogPost
+
+<style>
+    .tag-card {
+        display: flex;
+        float: left;
+        margin-right: 10px;
+        padding: 4px;
+        border-radius: 4px;
+        margin-bottom: 5px;
+    }
+
+    .tag0 {
+        background-color: lightskyblue;
+    }
+
+    .tag1 {
+        background-color: lightpink;
+    }
+
+    .tag2 {
+        background-color: lightgreen;
+    }
+
+    .tag3 {
+        background-color: lightgoldenrodyellow;
+    }
+
+    .tag4 {
+        background-color: orange;
+    }
+</style>
+
+@if (Model.BlogPostTags != null)
+{
+    @if (User.IsInRole("Admin") || ViewBag.CurrentUser == Model.UserId)
+    {
+        int i = 0;
+        @foreach (var tag in Model.BlogPostTags)
+        {
+            <div class="tag-card tag@(i%5)">
+                <span id="@tag.TagId" name="@tag.TagId">@tag.Tag.TagName</span>
+                <span class="mx-1"><i class="bi bi-x" style="font-weight: bold; cursor:pointer;" id="delete-btn-icon-@tag.TagId"></i></span>
+            </div>
+
+            i++;
+        }
+
+        <i class="bi bi-plus" id="add-tags" title="Add Tags" style="cursor:pointer; border:1px solid gray"></i>
+
+        <div style="clear:both"></div>
+
+        <div id="div-add-tags" style="display:none;">
+            @using (Html.BeginForm(actionName: "Save", controllerName: "BlogPostTags", method: FormMethod.Post))
+            {
+                <input type="hidden" id="blogPostId" name="blogPostId" value="@Model.BlogPostId" />
+                <input list="blogposttags" name="tags" id="tags" multiple separator="," type="text">
+                <datalist id="blogposttags">
+                    @foreach (var tag in ViewBag.Tags)
+                    {
+                        <option value=@tag.TagName id="@tag.TagId"></option>
+                    }
+                </datalist>
+                <button class="btn btn-primary upload-result" style="float: right;" type="submit">Save</button>
+            }
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const separator = ',';
+
+                for (const input of document.getElementsByTagName("input")) {
+                    if (!input.multiple) {
+                        continue;
+                    }
+
+                    if (input.list instanceof HTMLDataListElement) {
+                        const optionsValues = Array.from(input.list.options).map(opt => opt.value);
+                        let valueCount = input.value.split(separator).length;
+
+                        input.addEventListener("input", () => {
+                            const currentValueCount = input.value.split(separator).length;
+
+                            // Do not update list if the user doesn't add/remove a separator
+                            // Current value: "a, b, c"; New value: "a, b, cd" => Do not change the list
+                            // Current value: "a, b, c"; New value: "a, b, c," => Update the list
+                            // Current value: "a, b, c"; New value: "a, b" => Update the list
+                            if (valueCount !== currentValueCount) {
+                                const lsIndex = input.value.lastIndexOf(separator);
+                                const str = lsIndex !== -1 ? input.value.substr(0, lsIndex) + separator : "";
+                                filldatalist(input, optionsValues, str);
+                                valueCount = currentValueCount;
+                            }
+                        });
+                    }
+                }
+
+                function filldatalist(input, optionValues, optionPrefix) {
+                    const list = input.list;
+                    if (list && optionValues.length > 0) {
+                        list.innerHTML = "";
+
+                        const usedOptions = optionPrefix.split(separator).map(value => value.trim());
+
+                        for (const optionsValue of optionValues) {
+                            if (usedOptions.indexOf(optionsValue) < 0) { // Skip used values
+                                const option = document.createElement("option");
+                                option.value = optionPrefix + optionsValue;
+                                list.append(option);
+                            }
+                        }
+                    }
+                }
+            });
+
+            $('.bi-x').on('click', function (ev) {
+                var targetId = ev.target.id.split('-');
+                var tagId = targetId[targetId.length - 1];
+                $.post("/BlogPostTags/Delete/" + @Model.BlogPostId + "/" + tagId, null, function (data, status) {
+                    if (status == "success") {
+                        console.log(data);
+                        if (data == "Blog post tag deleted") {
+                            ev.target.parentElement.parentElement.remove();
+                        }
+                    }
+                    else {
+                        console.log("Error calling delete tag");
+                    }
+                });
+            });
+
+            $('#add-tags').on('click', function (ev) {
+                $(ev.target).hide();
+                $('#div-add-tags').show();
+            });
+        </script>
+    }
+    else 
+    {
+        int i = 0;
+        @foreach (var tag in Model.BlogPostTags)
+        {
+            <div class="tag-card tag@(i%5)">
+                <span id="@tag.TagId" name="@tag.TagId">@tag.Tag.TagName</span>
+            </div>
+            i++;
+        }
+        <div style="clear:both"></div>
+    }
+}
+
+
+

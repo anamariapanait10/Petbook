@@ -69,12 +69,12 @@ button:focus {
              
             @using (Html.BeginForm(actionName: "New", controllerName: "Posts", method: FormMethod.Post))
             {
-                <div class="form-group">
+               /* <div class="form-group">
                     @Html.LabelFor(model => model.PetId, " Select the pet", new { @class = "control-label" })
                     @Html.DropDownListFor(m => m.PetId, new SelectList(Model.Pets, "Value", "Text"),
                     "Select the pet", new { @class = "form-control" })
                     @Html.ValidationMessageFor(model => model.PetId, null, new { @class = "text-danger" })
-                </div>
+                </div>*/
                 <br />
 
                 <div class="form-group">
