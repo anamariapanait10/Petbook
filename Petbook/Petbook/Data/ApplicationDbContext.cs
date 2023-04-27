@@ -1,11 +1,7 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Petbook.Models;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Petbook.Data
 {
@@ -274,7 +270,7 @@ namespace Petbook.Data
                 {
                     PostId = i,
                     PetId = (pets[random.Next(pets.Count)] as Pet).PetId,
-                    Photo = imgs[random.Next(imgs.Length)],
+                    PostPhoto = imgs[random.Next(imgs.Length)],
                     Description = "Description " + i,
                     PostDate = DateTime.Now.AddDays(i)
                 };

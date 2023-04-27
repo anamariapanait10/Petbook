@@ -1,9 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Petbook.Data;
 using Petbook.Models;
+using System.ComponentModel.DataAnnotations;
+using System.IO.Compression;
+using System.Xml.Linq;
 
 namespace Petbook.Controllers
 {
@@ -32,9 +37,12 @@ namespace Petbook.Controllers
         public IActionResult Index()
         {
             var posts = db.Posts.Include("Pet")
+                                .Include("Pet.User")
                                 .Include("PostLikes")
                                 .Include("Comments")
                                 .Include("Comments.User")
+                                .Where(p => p.Pet.UserId != _userManager.GetUserId(User))
+                                .OrderByDescending(p => p.PostDate)
                                 .ToList();
 
             ViewBag.Posts = posts;
@@ -47,6 +55,34 @@ namespace Petbook.Controllers
             return View();
         }
 
+        [Authorize(Roles = "User,Admin")]
+        public IActionResult Explore()
+        {
+            var posts = db.Posts.Include("Pet")
+                                .Include("Pet.User")
+                                .Include("PostLikes")
+                                .Include("Comments")
+                                .Include("Comments.User")
+                                .OrderByDescending(p => p.PostDate)
+                                .ToList();
+
+            ViewBag.ExplorePosts = posts;
+
+            if (TempData.ContainsKey("message"))
+            {
+                ViewBag.Message = TempData["message"];
+            }
+
+            return View();
+        }
+
+        // display a post in a popup window with its comments and likes
+        [Authorize(Roles = "User,Admin")]
+        public IActionResult PopupPost(int postId)
+        {
+            return View();
+        }
+
         // displays a post with the given id
         // with its comments, likes, the pet who posted it
         // and the user who posted each comment
@@ -54,12 +90,12 @@ namespace Petbook.Controllers
         public IActionResult Show(int id)
         {
             Post post = db.Posts.Include("Pet")
+                                .Include("Pet.User")
                                 .Include("PostLikes")
                                 .Include("Comments")
                                 .Include("Comments.User")
                                 .Where(p => p.PostId == id)
                                 .First();
-
             return View(post);
         }
 
@@ -80,6 +116,7 @@ namespace Petbook.Controllers
             else
             {
                 Post p = db.Posts.Include("Pet")
+                                .Include("Pet.User")
                                 .Include("PostLikes")
                                 .Include("Comments")
                                 .Include("Comments.User")
@@ -97,6 +134,8 @@ namespace Petbook.Controllers
         {
             Post post = new Post();
 
+            post.Pets = GetPetsOfCurrentUser();
+
             return View(post);
         }
 
@@ -104,12 +143,10 @@ namespace Petbook.Controllers
         [HttpPost]
         public IActionResult New(Post post)
         {
-
             post.PostDate = DateTime.Now;
 
             if (ModelState.IsValid)
             {
-
                 db.Posts.Add(post);
                 db.SaveChanges();
                 TempData["message"] = "The post was added";
@@ -117,6 +154,16 @@ namespace Petbook.Controllers
             }
             else
             {
+                var errors = ModelState.Values.Where(E => E.Errors.Count > 0)
+                         .SelectMany(E => E.Errors)
+                         .Select(E => E.ErrorMessage)
+                         .ToList();
+                foreach (var i in errors)
+                {
+                    Console.WriteLine(i);
+                }
+
+                post.Pets = GetPetsOfCurrentUser();
                 return View(post);
             }
         }
@@ -131,6 +178,7 @@ namespace Petbook.Controllers
                                 .Where(p => p.PostId == id)
                                 .First();
 
+            post.Pets = GetPetsOfCurrentUser();
 
             // edit only the posts that are posted on the pets profile of the current user
             if (post.Pet.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
@@ -159,7 +207,7 @@ namespace Petbook.Controllers
             {
                 if (post.Pet.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
                 {   
-                    post.Photo = requestPost.Photo;
+                    post.PostPhoto = requestPost.PostPhoto;
                     post.Description = requestPost.Description;
                     post.PostDate = requestPost.PostDate;
                     TempData["message"] = "The post has been modified";
@@ -168,6 +216,7 @@ namespace Petbook.Controllers
                 }
                 else
                 {
+                    post.Pets = GetPetsOfCurrentUser();
                     TempData["message"] = "Cannot edit the posts that aren't yours";
                     return RedirectToAction("Show/" + id);
                 }
@@ -200,6 +249,23 @@ namespace Petbook.Controllers
             }
         }
 
+        [NonAction]
+        public IEnumerable<SelectListItem> GetPetsOfCurrentUser()
+        {
+            var selectList = new List<SelectListItem>();
+            var pets = db.Pets.Where(p => p.UserId == _userManager.GetUserId(User)).ToList();
 
+            foreach (var p in pets)
+            {
+                // we add the pets needed for the dropdown
+                selectList.Add(new SelectListItem
+                {
+                    Value = p.PetId.ToString(),
+                    Text = p.PetName
+                });
+            }
+
+            return selectList;
+        }
     }
 }

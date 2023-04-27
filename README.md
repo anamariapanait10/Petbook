@@ -8,6 +8,11 @@ Social media platform for pet owners where you can share photos and stories abou
 - Panait Ana-Maria
 - Teodorescu George Tiberiu
 
+### Requirements:
+-> Install Croppie
+`npm install croppie`
+
+
 ## User stories :raising_hand:
     1. As a user, I want to share photos of my pet.
     2. As a user, I want to be able to see the number of likes on a post and also the list of users that liked it.

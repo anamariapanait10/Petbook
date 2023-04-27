@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Petbook.Data;
 using Petbook.Models;
 using System.Data;
+using System.IO;
 
 namespace Petbook.Controllers
 {
@@ -25,88 +26,75 @@ namespace Petbook.Controllers
             _roleManager = roleManager;
         }
 
-        [HttpPost]
+        [HttpPost("Comments/New/")]
         [Authorize(Roles = "User,Admin")]
-        public IActionResult New(Comment comment)
+        public IActionResult New([FromBody] Comment comment)
         {
-
+            comment.CommentDate = DateTime.Now;
+            comment.UserId = _userManager.GetUserId(User);
             if (ModelState.IsValid)
             {
                 db.Comments.Add(comment);
                 db.SaveChanges();
-                return Redirect("/Posts/Show/" + comment.PostId);
+                return Ok("Comment added");
             }
-
             else
             {
-                return Redirect("/Posts/Show/" + comment.PostId);
+                return BadRequest();
             }
         }
 
-        [HttpPost]
+        [HttpPost("Comments/checkIsCurrentUser/{userId}")]
         [Authorize(Roles = "User,Admin")]
-        public IActionResult Delete(int commentId)
+        public ActionResult<string> checkIsCurrentUser([FromRoute] string userId)
         {
+            if(userId == _userManager.GetUserId(User))
+            {
+                return Ok("Yes");
+            } else
+            {
+                return Ok("No");
+            }
+        }
+
+        [HttpPost("Comments/Delete/{commId}")]
+        [Authorize(Roles = "User,Admin")]
+        public ActionResult<string> Delete([FromRoute] int commId)
+        {   
             Comment comment = db.Comments
                               .Include("Post")
                               .Include("Post.Pet.User")
-                              .Where(c => c.CommentId == commentId)
+                              .Where(c => c.CommentId == commId)
                               .First();
-            if (comment.Post.Pet.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
+
+            db.Comments.Remove(comment);
+            db.SaveChanges();
+            return Ok("Comment deleted");
+        }
+
+        [HttpGet("Comments/GetCommentContent/{commId}")]
+        [Authorize(Roles = "User,Admin")]
+        public ActionResult<string> GetCommentContent(int commId)
+        {
+            Comment comment = db.Comments.Find(commId);
+            return Ok(comment.CommentContent);
+        }
+
+        [HttpPost("Comments/Edit/{commId}")]
+        [Authorize(Roles = "User,Admin")]
+        public IActionResult Edit([FromRoute] int commId, [FromForm] string commContent)
+        {
+            Comment comment = db.Comments.Find(commId);
+            comment.CommentContent = commContent;
+
+            if (ModelState.IsValid)
             {
-                db.Comments.Remove(comment);
                 db.SaveChanges();
-                return Redirect("/Posts/Show/" + comment.CommentId);
-            }
-
-            else
-            {
-                TempData["message"] = "You cannot delete a comment which isn't yours";
-                return RedirectToAction("Index", "Posts");
-            }
-        }
-
-        [Authorize(Roles = "User,Admin")]
-        public IActionResult Edit(int commentId)
-        {
-            Comment comment = db.Comments.Find(commentId);
-
-            if (comment.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
-            {
-                return View(comment);
-            }
-
-            else
-            {
-                TempData["message"] = "You cannot edit a comment which isn't yours";
-                return RedirectToAction("Index", "Posts");
-            }
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "User,Admin")]
-        public IActionResult Edit(int commentId, Comment requestComment)
-        {
-            Comment comment = db.Comments.Find(commentId);
-
-            if (comment.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
-            {
-                if (ModelState.IsValid)
-                {
-                    comment.CommentContent = requestComment.CommentContent;
-                    db.SaveChanges();
-
-                    return Redirect("/Posts/Show/" + comment.PostId);
-                }
-                else
-                {
-                    return View(requestComment);
-                }
+                return Ok("Edited");      
             }
             else
             {
-                TempData["message"] = "You cannot make changes on this comment.";
-                return RedirectToAction("Index", "Posts");
+                return Ok("Error at editing");
             }
         }
     }
