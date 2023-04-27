@@ -153,9 +153,8 @@
         var p_height = parseInt(p.css('height').substring(0, p.css('height').length - 2));
         var ci_height = parseInt(ci.css('height').substring(0, ci.css('height').length - 2));
         var cd_height = parseInt(commentsDiv.css('height').substring(0, commentsDiv.css('height').length - 2));
-        commentsScroll.css('max-height', String(p_height) + 'px');
-        //commentsScroll.css('height', String(p_height) + 'px');
-        @*String(p_height - ci_height - cd_height - 50) + 'px');*@
+        commentsScroll.css('max-height', String(p_height - ci_height - cd_height - 50) + 'px');
+
         cs.toggle();
         
         if (cs.css('display') == 'none') {
@@ -167,15 +166,31 @@
             pcard.css('width', '62vw');
             ci.css('transform', 'translateX(32vw)');
         }
-
     });
+
+    function recalculateDimensions() {
+        var cs = $('#comment-section-' + @Model.PostId);
+        var p = $('#postdiv-' + @Model.PostId);
+        var pcard = $('#postcard-' + @Model.PostId);
+        var ci = $('#comment-input-' + @Model.PostId);
+        var commentsScroll = $('#comments-scroll-' + @Model.PostId);
+        var commentsDiv = $('#comments-div-' + @Model.PostId);
+        cs.css('max-height', p.css('height'));
+
+        var p_height = parseInt(p.css('height').substring(0, p.css('height').length - 2));
+        var ci_height = parseInt(ci.css('height').substring(0, ci.css('height').length - 2));
+        var cd_height = parseInt(commentsDiv.css('height').substring(0, commentsDiv.css('height').length - 2));
+        commentsScroll.css('max-height', String(p_height - ci_height - cd_height) + 'px');
+    }
+
+    $(window).on('resize', recalculateDimensions);
 
     var editingCommentId = -1;
     
     function addComment(postId, postPhoto) {
         var commentContent = $('#CommentContent-' + postId).val();
-        var btnText = $('#add-comm-btn-' + @Model.PostId).val();
-        
+        var btnText = $('#add-comm-btn-' + postId).text();
+        console.log(btnText);
         if (btnText == 'Post'){
             $.ajax({
                 url: "/Comments/New",
@@ -200,7 +215,7 @@
                         $('#comment-content-' + editingCommentId).html(commentContent);
                     }
                 });
-                $('#add-comm-btn-' + @Model.PostId).html('Post');
+                $('#add-comm-btn-' + postId).html('Post');
             }
         }
     }
