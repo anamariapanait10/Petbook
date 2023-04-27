@@ -76,6 +76,13 @@ namespace Petbook.Controllers
             return View();
         }
 
+        // display a post in a popup window with its comments and likes
+        [Authorize(Roles = "User,Admin")]
+        public IActionResult PopupPost(int postId)
+        {
+            return View();
+        }
+
         // displays a post with the given id
         // with its comments, likes, the pet who posted it
         // and the user who posted each comment

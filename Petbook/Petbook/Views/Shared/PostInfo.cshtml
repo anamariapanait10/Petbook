@@ -56,9 +56,8 @@
                 <br />
                 <br />
                 <div id="comment-input-@Model.PostId" class="d-flex justify-content-center col">
-                    <input name="CommentContent-@Model.PostId" class="form-control" style="border-radius: 0 0 0 3px; border-bottom-color: white" placeholder="Add a comment" />
-                    <button onclick="addComment(@Model.PostId)" class="btn text-right" type="submit" style="background-color: #eab676; border-radius: 0 0 3px 0" type="submit">Post</button>
-                   
+                    <input id="CommentContent-@Model.PostId" type ="text" class="form-control" style="border-radius: 0 0 0 3px; border-bottom-color: white" placeholder="Add a comment" />
+                    <button id="add-comm-btn-@Model.PostId" onclick="addComment('@Model.PostId','@Model.PostPhoto')" class="btn text-right" type="submit" style="background-color: #eab676; border-radius: 0 0 3px 0" type="submit">Post</button>
                 </div>
             </div>
         </div>
@@ -70,9 +69,28 @@
             <div id="comments-scroll-@Model.PostId" style="overflow-y: auto; overflow-x:clip;">
                 @foreach (Petbook.Models.Comment comm in @Model.Comments)
                 {
-                    <div class="d-flex">
-                        <img style="width:55px; height:55px" class="rounded-circle px-2 py-2 align-content-start" src=@Model.PostPhoto alt="No photo">
-                        <p style="vertical-align: middle; margin: auto auto auto 0; text-align:left">@comm.CommentContent</p>
+                    <div id="comment-div-@comm.CommentId" class="d-flex">
+                        <img style="width:55px; height:55px" class="rounded-circle px-2 py-2 align-content-start" src="@Model.PostPhoto" alt="No photo">
+                        <div class="d-flex col">
+                            <span id="comment-content-@comm.CommentId" style="vertical-align: middle; margin: auto auto auto 0; text-align:left">
+                            @comm.CommentContent
+                            </span>
+                            <span id="comment-icons-@comm.CommentId" style="margin: auto 0 auto auto; text-align:left"></span>
+                        </div>
+                        <script>
+                            var ci = $('#comment-icons-' + @comm.CommentId);
+
+                            $.post("/Comments/checkIsCurrentUser/@comm.UserId", null, function (data, status) {
+                                if (status == "success") {
+                                    if (data == "Yes") {
+                                        var stringHtml = "<i onclick=\"editComment(" + @comm.CommentId + "," + @Model.PostId + ")\" class=\"btn bi bi-pencil\" style=\"color:#2596be\"> </i>" +
+                                            " <i onclick=\"deleteComment(" + @comm.CommentId + ")\" class=\"btn bi bi-trash3\" style=\"color:#be4d25\"> </i>";
+                                        ci.html(stringHtml);
+                                    }
+                                }
+                            });
+                            
+                        </script>
                     </div>
                 }
             </div>
@@ -135,7 +153,9 @@
         var p_height = parseInt(p.css('height').substring(0, p.css('height').length - 2));
         var ci_height = parseInt(ci.css('height').substring(0, ci.css('height').length - 2));
         var cd_height = parseInt(commentsDiv.css('height').substring(0, commentsDiv.css('height').length - 2));
-        commentsScroll.css('max-height', '100%'); @*String(p_height - ci_height - cd_height - 50) + 'px');*@
+        commentsScroll.css('max-height', String(p_height) + 'px');
+        //commentsScroll.css('height', String(p_height) + 'px');
+        @*String(p_height - ci_height - cd_height - 50) + 'px');*@
         cs.toggle();
         
         if (cs.css('display') == 'none') {
@@ -149,34 +169,58 @@
         }
 
     });
-    
-    function addComment(postId) {
-        var commentContent = $("input[name='CommentContent-" + @Model.PostId + "']").val();
 
-        $.ajax({
-            url: "/Comments/New",
-            type: "POST",
-            data: JSON.stringify({ CommentContent: commentContent, PostId: postId }),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function () {
-                console.log("Comment added");
-            },
-            error: function(e) {
-                console.log(e);
+    var editingCommentId = -1;
+    
+    function addComment(postId, postPhoto) {
+        var commentContent = $('#CommentContent-' + postId).val();
+        var btnText = $('#add-comm-btn-' + @Model.PostId).val();
+        
+        if (btnText == 'Post'){
+            $.ajax({
+                url: "/Comments/New",
+                type: "POST",
+                data: JSON.stringify({ CommentContent: commentContent, PostId: postId }),
+                contentType: "application/json; charset=utf-8",
+                success: function (res) {
+                    var new_comment = "<div class='d-flex'><img style='width:55px; height:55px' class='rounded-circle px-2 py-2 align-content-start' src='" +
+                        postPhoto + "'><p style='vertical-align: middle; margin: auto auto auto 0; text-align:left'>" +
+                        commentContent + "</p></div>";
+                    $('#comments-scroll-' + postId).append(new_comment);
+                },
+                error: function(e) {
+                    console.log(e);
+                }
+            });
+        }
+        else { // btnText == 'Edit'
+            if(editingCommentId != -1) {
+                $.post("/Comments/Edit/" + editingCommentId, {commContent: commentContent}, function (data, status) {
+                    if (status == "success") {
+                        $('#comment-content-' + editingCommentId).html(commentContent);
+                    }
+                });
+                $('#add-comm-btn-' + @Model.PostId).html('Post');
+            }
+        }
+    }
+
+    function deleteComment(commId){
+        $.post("/Comments/Delete/" + commId, null, function (data, status) {
+            if (status == "success") {
+                $('#comment-div-' + commId).remove();
             }
         });
     }
 
+    function editComment(commId, postId){
+        $('#add-comm-btn-' + postId).html('Edit');
+
+        $.get("/Comments/GetCommentContent/" + commId, function (data) {
+            var comi = $('#CommentContent-' + postId);
+            editingCommentId = commId;
+            comi.val(data);
+        });
+    }
 
 </script>
-
-@*
-
-$('#comment-section-' + @Model.PostId).prepend(
-                    "<div> new div </div>"
-                    "<div class='d-flex'><img style='width:55px; height:55px' class='rounded-circle px-2 py-2 align-content-start' src="
-                        + @Model.PostPhoto + "><p style='vertical-align: middle; margin: auto auto auto 0; text-align:left'>"
-                        + commentContent + "< /p> < /div>"
-                );
-*@
