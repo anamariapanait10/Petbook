@@ -35,17 +35,20 @@ Social media platform for pet owners where you can share photos and stories abou
 
 ## Backlog creation :page_with_curl:
 For the backlog creation we used [Trello platform](https://trello.com/b/4mMTerl6/petbook).
+![image](https://github.com/anamariapanait10/Petbook/blob/main/Trello.png)
 
 ## Diagrams (UML, workflow)
 
+![image](https://github.com/anamariapanait10/Petbook/blob/main/ERD.jpg)
+![image](https://github.com/anamariapanait10/Petbook/blob/main/UML.png)
 
 ## Source control (branch creation, merge/rebase, pull requests)
+![image](https://github.com/anamariapanait10/Petbook/blob/main/Branches.png)
 
 ## Automated tests
 
 ## Bug report
-
-## Refactoring, code standards
+![image](https://github.com/anamariapanait10/Petbook/blob/main/BugReport1.png)## Refactoring, code standards
 
 ## Comments
 
