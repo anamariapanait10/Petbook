@@ -48,7 +48,9 @@ For the backlog creation we used [Trello platform](https://trello.com/b/4mMTerl6
 ## Automated tests
 
 ## Bug report
-![image](https://github.com/anamariapanait10/Petbook/blob/main/BugReport1.png)## Refactoring, code standards
+![image](https://github.com/anamariapanait10/Petbook/blob/main/BugReport1.png)
+
+## Refactoring, code standards
 
 ## Comments
 
