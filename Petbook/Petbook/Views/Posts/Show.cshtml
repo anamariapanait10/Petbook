@@ -1,0 +1,5 @@
+﻿@model Petbook.Models.Post
+
+<div class="card" id="postcard-@Model.PostId" style="width: 30vw; margin:auto; text-align:center">
+    @Html.Partial("PostInfo", @Model)
+</div>
