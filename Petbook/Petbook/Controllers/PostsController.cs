@@ -127,6 +127,17 @@ namespace Petbook.Controllers
             }
         }
 
+        public IActionResult GetPopupContent(int id)
+        {
+            Post post = db.Posts.Include("Pet")
+                                .Include("Pet.User")
+                                .Include("PostLikes")
+                                .Include("Comments")
+                                .Include("Comments.User")
+                                .Where(p => p.PostId == id)
+                                .First();
+            return PartialView("PostInfo", post);
+        }
        
         // form for adding a new post
         [Authorize(Roles = "User,Admin")]
