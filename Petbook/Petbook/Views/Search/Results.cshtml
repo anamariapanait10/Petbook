@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Petbook";
+}
+
+<div>
+    <form method="GET">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search for values..." name="search"
+                   value="@ViewBag.search">
+            <button class="btn btn-primary upload-result" style="float: right" type="submit">Search</button>
+        </div>
+    </form>
+</div>
+
+<div style="width:90%">
+    <h3>Here's what we found for "@ViewBag.search":</h3>
+    @ViewBag.results result(s)
+    <br />
+    @if (ViewBag.NbPets > 0)
+    {
+        <div style="float:left; margin-right:20px;width:55%; position:relative;">
+            <br />
+            @foreach (Petbook.Models.Pet pet in ViewBag.Pets)
+            {
+                <div class="card" style="width: 100%; margin:auto;">
+                    @Html.Partial("PetShortInfo", pet)
+                </div>
+                <br />
+            }
+        </div>
+    }
+    @if (ViewBag.NbUsers > 0)
+    {
+        <div style="float:left;max-width:35%; position:relative;">
+            <span style="margin-left:15px">Users </span><span style="font-size:12px">@ViewBag.NbUsers result(s)</span><br />
+            @foreach (ApplicationUser user in ViewBag.Users)
+            {
+                <div class="card1 blog-card">
+                    @Html.Partial("UserShortInfo", user)
+                </div>
+                <br />
+            }
+        </div>
+    }
+</div>

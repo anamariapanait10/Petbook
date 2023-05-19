@@ -1,0 +1,29 @@
+﻿@model Petbook.Models.Pet
+
+<div class="card-body">
+	<div style="text-align:center"><h3>@Model.PetName</h3></div>
+	<p>@Model.Description</p>
+	<span>Owner: </span>@Model.User.UserName<br />
+	@if (Model.Posts != null)
+	{
+		var idx = 0;
+		<span style="font-size:11px;">@Model.Posts.Count post(s)</span><br/>
+		<div style="width:100%; overflow: hidden;">
+		@foreach (Petbook.Models.Post post in @Model.Posts)
+		{
+			if (idx >= 4)
+				break;
+			<img src="@post.PostPhoto" style="width:20%; margin-right:5px;" />
+			idx++;
+		}
+		</div>
+	}
+	else
+	{
+		<span style="font-size:11px;">0 posts</span>
+	}
+	<br />
+	<span>Category: </span>@Model.Category<br />
+	<span>Location: </span>@Model.Location<br />
+	<div style="clear:both;"></div>
+</div>

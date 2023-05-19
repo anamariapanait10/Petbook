@@ -57,7 +57,7 @@ namespace Petbook.Controllers
             var allTags = db.Tags.ToList();
             ViewBag.Tags = allTags;
 
-            return Redirect("/BlogPosts/Show/" + blogPostId);
+            return Redirect("/BlogPosts/Edit/" + blogPostId);
         }
 
 

@@ -32,6 +32,11 @@ namespace Petbook.Controllers
             ViewBag.SearchString = search;
             ViewBag.ShowViewBtn = true;
 
+            if (TempData.ContainsKey("message"))
+            {
+                ViewBag.Message = TempData["message"];
+            }
+
             //changes made so that any user can see all blogposts
             ViewBag.CurrentUser = _userManager.GetUserId(User);
             var blogPosts = db.BlogPosts.Include("User")
@@ -69,13 +74,13 @@ namespace Petbook.Controllers
                                   .Include("User")
                                   .Where(b => b.BlogPostId == id)
                                   .FirstOrDefault();
-                
+
                 if (blogPosts == null)
                 {
                     TempData["message"] = "The blog post doesn't exist";
                     return RedirectToAction("Index", "BlogPosts");
                 }
-                                  
+
                 return View(blogPosts);
             }
             else
@@ -94,7 +99,7 @@ namespace Petbook.Controllers
                 }
                 return View(blogPosts);
             }
-            
+
         }
 
         [Authorize(Roles = "User,Admin")]
@@ -151,9 +156,13 @@ namespace Petbook.Controllers
             BlogPost? blogPost = db.BlogPosts.Include("User")
                                             .Include("BlogPostLikes")
                                             .Include("BlogPostTags")
+                                            .Include("BlogPostTags.Tag")
                                             .Where(bp => bp.BlogPostId == id)
                                             .FirstOrDefault();
-            if(blogPost != null)
+            ViewBag.CurrentUser = _userManager.GetUserId(User);
+            var tags = db.Tags.ToList();
+            ViewBag.Tags = tags;
+            if (blogPost != null)
             {
                 if (blogPost.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
                 {
@@ -186,9 +195,9 @@ namespace Petbook.Controllers
             {
                 if (blogPost.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
                 {
-
+                    blogPost.BlogPostTitle = requestBlogPost.BlogPostTitle;
                     blogPost.BlogPostContent = requestBlogPost.BlogPostContent;
-                    TempData["message"] = "The blog post was modified.";
+                    TempData["message"] = "The blog post \"" + blogPost.BlogPostTitle + "\"was modified.";
                     db.SaveChanges();
                     return RedirectToAction("Index");
                 }
@@ -212,7 +221,7 @@ namespace Petbook.Controllers
                                          .Include("BlogPostTags")
                                          .Where(bp => bp.BlogPostId == id)
                                          .FirstOrDefault();
-        ViewBag.CurrentUser = _userManager.GetUserId(User);
+            ViewBag.CurrentUser = _userManager.GetUserId(User);
             if (blogPost != null)
             {
                 if (blogPost.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
