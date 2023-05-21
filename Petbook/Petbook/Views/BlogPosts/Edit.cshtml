@@ -1,0 +1,114 @@
+﻿<style>
+    .btn-secondary {
+        border-color: #0d6efd;
+        background-color: white;
+        color: #0d6efd;
+        line-height: 1;
+        width: 60px;
+        float: right;
+    }
+
+    .btn-third {
+        border-color: #0d6efd;
+        background-color: #0d6efd;
+        color: white;
+        line-height: 1;
+        width: 100px;
+        float: right;
+    }
+
+    .blog-post-title {
+        text-align: center;
+        padding: auto;
+        font-size: 20px;
+        background-color: white;
+        width: 1100px;
+        height: 30px;
+        margin: 10px auto;
+    }
+
+    .show-less {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 400px;
+    }
+
+    .div-tags {
+        background-color: #f7f7f2;
+        margin: 0;
+        padding-bottom: 0.25rem !important;
+        padding-right: 1rem !important;
+        padding-left: 1rem !important;
+    }
+
+    .owner {
+        text-align: left;
+        opacity: 0.5;
+        font-size: 12px;
+        /* width */
+        :: -webkit-scrollbar
+
+    {
+        width: 6px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px lightgrey;
+        border-radius: 1px;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: darkgray;
+        border-radius: 1px;
+    }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: gray;
+        }
+
+</style>
+
+@model Petbook.Models.BlogPost
+
+<div class="container mt-3">
+    <div class="card-body" style="background-color:#f7f7f2; padding: 0; width:100%; height: 100%">
+        <div class="card-body" style="--bs-gutter-x: 0rem;">
+
+            @using (Html.BeginForm(actionName: "Edit", controllerName: "BlogPosts",
+            method: FormMethod.Post,
+            routeValues: new { id = Model.BlogPostId }))
+            {
+
+                @Html.Label("BlogPostTitle", "Title")
+                <br />
+                @Html.EditorFor(m => m.BlogPostTitle, new { htmlAttributes = new { @class = "form-control" } })
+
+                @Html.ValidationMessageFor(m => m.BlogPostTitle, null, new { @class = "text-danger" })
+                <br />
+
+                <br />
+
+                @Html.Label("BlogPostContent", "Content")
+                <br />
+                @Html.TextArea("BlogPostContent", Model.BlogPostContent, new { @class = "form-control summernote" })
+
+                @Html.ValidationMessageFor(m => m.BlogPostContent, null, new { @class = "text-danger" })
+                <br />
+                <br />
+                <div style="float:right; padding-right:10px;">
+                    <button class="btn btn-secondary upload-result" style="width:auto; background-color:lightblue" type="submit">Save changes</button>
+                    <a class="btn btn-secondary upload-result" style="margin-right:5px; width:auto;" href="/BlogPosts/Index">Cancel</a>
+                </div>
+
+                <br />
+            }
+            <div class="div-tags">
+                @Html.Partial("BlogPostTags", Model)
+            </div>
+        </div>
+    </div>
+</div>

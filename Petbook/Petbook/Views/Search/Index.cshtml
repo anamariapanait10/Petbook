@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Petbook";
+}
+
+<div>
+    <div style="width:80%; margin:auto; text-align:center;">
+        <h1 style="color:cornflowerblue;">What do you want to look for today?</h1>
+        <br />
+        <form method="GET">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Search for values..." name="search"
+                       value="@ViewBag.SearchString">
+                <button class="btn btn-primary upload-result" style="float: right" type="submit">Search</button>
+            </div>
+        </form>
+        <br /><br />
+        <div>
+            <h3>What you can find</h3>
+            <div>
+                <i class="bi bi-piggy-bank" style="margin-right:20px;"></i>
+                <i class="bi bi-people"></i>
+                <br />
+                <span style="margin-right:20px;">Pets</span><span>Users</span>
+            </div>
+        </div>
+    </div>
+</div>

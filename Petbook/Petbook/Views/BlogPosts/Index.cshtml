@@ -1,13 +1,13 @@
 ﻿<style>
     .card1 {
-    position: relative;
-    min-width: 0;
-    word-wrap: break-word;
-    background-color: #fff;
-    background-clip: border-box;
-    border: 1px solid rgba(0,0,0,.125);
-    border-radius: .25rem;
-}
+        position: relative;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 1px solid rgba(0,0,0,.125);
+        border-radius: .25rem;
+    }
 
     input[type="file"] {
         cursor: pointer;
@@ -17,9 +17,9 @@
         outline: 0;
     }
 
-    .blog-card{
+    .blog-card {
         left: 25%;
-        width:50%;
+        width: 50%;
     }
 
     .file-btn {
@@ -97,14 +97,31 @@
 
     .btn-secondary {
         border-color: #0d6efd;
-        background-color:white;
+        background-color: white;
         color: #0d6efd;
-        line-height:1;
-        width:60px;
-        float:right;
+        line-height: 1;
+        width: 60px;
+        float: right;
+    }
+
+    .div-tags {
+        background-color: #f7f7f2;
+        margin: 0;
+        padding-bottom: 0.25rem !important;
+        padding-right: 1rem !important;
+        padding-left: 1rem !important;
     }
 
 </style>
+
+@{
+    ViewData["Title"] = "Petbook Blog Posts";
+}
+
+@if (ViewBag.Message != null)
+{
+    <h2 class="alert-success p-3 rounded-3 text-center mb-5">@ViewBag.Message</h2>
+}
 
 <div>
     <div style="width:600px; margin:auto; text-align:center; width: calc(30vw - 2px);">
@@ -125,31 +142,31 @@
             <button class="btn btn-primary upload-result" style="float: right" type="submit">Search</button>
         </div>
     </form>
-    <br/>
-    <br/>
-@foreach (Petbook.Models.BlogPost blogPost in ViewBag.BlogPosts)
-{
-    <div class="card1 blog-card">
+    <br />
+    <br />
+    @foreach (Petbook.Models.BlogPost blogPost in ViewBag.BlogPosts)
+    {
+        <div class="card1 blog-card">
 
-        @Html.Partial("BlogPostInfo", blogPost)
-        <div class="mx-3 mb-1" style="background-color: #f7f7f2">
-            @if (blogPost.BlogPostTags != null)
-            {
-                int i = 0;
-                @foreach (var tag in blogPost.BlogPostTags)
+            @Html.Partial("BlogPostInfo", blogPost)
+            <div class="div-tags">
+                @if (blogPost.BlogPostTags != null)
                 {
-                    <div class="tag-card tag@(i%5)">
-                        <span id="@tag.TagId" name="@tag.TagId">@tag.Tag.TagName</span>
-                    </div>
-                    i++;
+                    int i = 0;
+                    @foreach (var tag in blogPost.BlogPostTags)
+                    {
+                        <div class="tag-card tag@(i%5)">
+                            <span id="@tag.TagId" name="@tag.TagId">@tag.Tag.TagName</span>
+                        </div>
+                        i++;
+                    }
+                    <div style="clear:both"></div>
                 }
-                <div style="clear:both"></div>
-            }
+            </div>
+
         </div>
 
-    </div>
-
-    <br />
-    <br />
-}
+        <br />
+        <br />
+    }
 </div>

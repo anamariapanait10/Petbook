@@ -11,8 +11,8 @@
         margin: 10px auto;
     }
 
-    .show-less{
-        white-space:nowrap;
+    .show-less {
+        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 400px;
@@ -22,9 +22,8 @@
         text-align: left;
         opacity: 0.5;
         font-size: 12px;
-        <style>
         /* width */
-        ::-webkit-scrollbar
+        :: -webkit-scrollbar
 
     {
         width: 6px;
@@ -48,16 +47,30 @@
         }
 </style>
 
+@if (ViewBag.ShowViewBtn == false)
+{
+    <a href="/BlogPosts/Index" style="margin-right:10px; float:right; text-decoration:none; font-size:12px; font-weight:bold;">View all</a>
+    <div style="clear:both"></div>
+    <br />
+}
+
 <div class="card-body" style="background-color:#f7f7f2; padding: 0; width:100%; height: 100%">
     <div class="row" style="--bs-gutter-x: 0rem;">
         <div class="d-flex col rounded-top" style="background-color: #eab676; width: 20%; margin:auto; align-self:center">
-                <span class="card-title d-block mt-2" style="font-size: 15px; font-weight: 300; text-align:center; width:100%"><b>@Model.BlogPostTitle</b></span>
-                <span class="owner">Posted by @Model.User.UserName</span> 
+            <span class="card-title d-block mt-2" style="font-size: 15px; font-weight: 300; text-align:center; width:100%"><b>@Model.BlogPostTitle</b></span>
+            <span class="owner">Posted by @Model.User.UserName</span>
         </div>
         <div class="card-body; width:100%; height:100% ">
-            
             <div class="m-2" style="text-align:left">
                 <i class="bi bi-list mt-5" style="font-size: 1rem; cursor:pointer" id="show-@Model.BlogPostId" onclick="show('@Model.BlogPostId');"></i>
+                @if (ViewBag.ShowViewBtn == true)
+                {
+                    @if (User.IsInRole("Admin") || ViewBag.CurrentUser == Model.UserId)
+                    {
+                        <a style="float:right; margin-left:3px;" title="Edit" href="/BlogPosts/Edit/@Model.BlogPostId"><i class="bi bi-pencil-square" style="font-size: 1rem; cursor:pointer; color:black;"></i></a>
+                    }
+                    <a style="float:right;" title="View" href="/BlogPosts/Show/@Model.BlogPostId"><i class="bi bi-eye" style="font-size: 1rem; cursor:pointer; color:black;"></i></a>
+                }
                 <div class="card-text show-less" id="card-@Model.BlogPostId">@Html.Raw(Model.BlogPostContent)</div>
             </div>
             <div class="d-flex justify-content-between col mt-4 mx-3">
@@ -65,13 +78,7 @@
                     <i id="like-btn-icon-@Model.BlogPostId" class="bi bi-hand-thumbs-up" style="font-size: 1.4rem"></i></a>
                     <span id="like-count-@Model.BlogPostId">@Model.BlogPostLikes.Count</span>
                 </span>
-                @if (ViewBag.ShowViewBtn == true){
-                   <a class="btn btn-secondary upload-result" href="/BlogPosts/Show/@Model.BlogPostId">View</a>
-                } else
-                {
-                    <a class="btn btn-secondary" href="/BlogPosts/Index" style="width:100px; margin-right:5px;">View all</a>
-                }
-                </div>
+            </div>
             <br />
         </div>
 
@@ -85,12 +92,12 @@
         $.post("/BlogPostLikes/New/" + @Model.BlogPostId, null, function (data, status) {
             if (status == "success") {
                 if (data == "Blog post with id " + @Model.BlogPostId + " liked") {
-                    likesCount_@Model.BlogPostId ++;
+                        likesCount_@Model.BlogPostId ++;
                     $('#like-btn-icon-' + @Model.BlogPostId).removeClass("bi-hand-thumbs-up");
                     $('#like-btn-icon-' + @Model.BlogPostId).addClass("bi-hand-thumbs-up-fill");
                     $('#like-btn-icon-' + @Model.BlogPostId).css("color", "#EECD7A");
                 } else {
-                    likesCount_@Model.BlogPostId --;
+                        likesCount_@Model.BlogPostId --;
                     $('#like-btn-icon-' + @Model.BlogPostId).removeClass("bi-hand-thumbs-up-fill");
                     $('#like-btn-icon-' + @Model.BlogPostId).addClass("bi-hand-thumbs-up");
                     $('#like-btn-icon-' + @Model.BlogPostId).css("color", "black");
@@ -101,7 +108,7 @@
                 console.log("Error calling like/dislike");
             }
         });
-       
+
     });
     $(document).ready(function () {
         $.post("/BlogPostLikes/IsLikedByCurrentUser/" + @Model.BlogPostId, null, function (data, status) {
@@ -119,13 +126,11 @@
         });
     });
 
-   function show (blogPostId) {
-        if($("#card-" + blogPostId).hasClass("show-less"))
-        {
+    function show(blogPostId) {
+        if ($("#card-" + blogPostId).hasClass("show-less")) {
             $("#card-" + blogPostId).removeClass("show-less");
         }
-        else
-        {
+        else {
             $("#card-" + blogPostId).addClass("show-less");
         }
     }
