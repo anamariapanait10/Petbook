@@ -49,7 +49,7 @@
 
 @if (ViewBag.ShowViewBtn == false)
 {
-    <a href="/BlogPosts/Index" style="margin-right:10px; float:right; text-decoration:none; font-size:12px; font-weight:bold;">View all</a>
+    <a href="/BlogPosts/Index" style="margin-right:10px; float:right; text-decoration:none; font-size:12px; font-weight:bold; color:#eab676">View all</a>
     <div style="clear:both"></div>
     <br />
 }
@@ -62,16 +62,24 @@
         </div>
         <div class="card-body; width:100%; height:100% ">
             <div class="m-2" style="text-align:left">
-                <i class="bi bi-list mt-5" style="font-size: 1rem; cursor:pointer" id="show-@Model.BlogPostId" onclick="show('@Model.BlogPostId');"></i>
+                <i class="bi bi-list mt-5" style="font-size: 1rem; cursor:pointer" id="show-@Model.BlogPostId" onclick="show('@Model.BlogPostId','@Model.BlogPostContent')"></i>
                 @if (ViewBag.ShowViewBtn == true)
                 {
                     @if (User.IsInRole("Admin") || ViewBag.CurrentUser == Model.UserId)
                     {
-                        <a style="float:right; margin-left:3px;" title="Edit" href="/BlogPosts/Edit/@Model.BlogPostId"><i class="bi bi-pencil-square" style="font-size: 1rem; cursor:pointer; color:black;"></i></a>
+                        <a style="float:right; margin-left:6px;" title="Edit" href="/BlogPosts/Edit/@Model.BlogPostId"><i class="bi bi-pencil-square" style="font-size: 1rem; cursor:pointer; color:black;"></i></a>
                     }
-                    <a style="float:right;" title="View" href="/BlogPosts/Show/@Model.BlogPostId"><i class="bi bi-eye" style="font-size: 1rem; cursor:pointer; color:black;"></i></a>
+                    <a style="float:right" title="View" href="/BlogPosts/Show/@Model.BlogPostId"><i class="bi bi-eye" style="font-size: 1rem; cursor:pointer; color:black;"></i></a>
                 }
-                <div class="card-text show-less" id="card-@Model.BlogPostId">@Html.Raw(Model.BlogPostContent)</div>
+                
+                @if (@Model.BlogPostContent.IndexOf("<p>") != -1)
+                {
+                    <div class="card-text text-truncate" id="card-@Model.BlogPostId">@Model.BlogPostContent.Substring(@Model.BlogPostContent.IndexOf("<p>")+3, @Model.BlogPostContent.IndexOf("</p>")-3)</div>
+                } else
+                {
+                    <div class="card-text text-truncate" id="card-@Model.BlogPostId">@Html.Raw(Model.BlogPostContent)</div>
+                }
+
             </div>
             <div class="d-flex justify-content-between col mt-4 mx-3">
                 <span id="like-btn-@Model.BlogPostId">
@@ -126,12 +134,19 @@
         });
     });
 
-    function show(blogPostId) {
-        if ($("#card-" + blogPostId).hasClass("show-less")) {
-            $("#card-" + blogPostId).removeClass("show-less");
+    function show(blogPostId, blogPostContent) {
+        if ($("#card-" + blogPostId).hasClass("text-truncate")) {
+            $("#card-" + blogPostId).removeClass("text-truncate");
+            $("#card-" + blogPostId).text(blogPostContent);
         }
         else {
-            $("#card-" + blogPostId).addClass("show-less");
+            $("#card-" + blogPostId).addClass("text-truncate");
+
+            if (blogPostContent.indexOf("<p>") != -1) {
+                $("#card-" + blogPostId).text(blogPostContent.substring(blogPostContent.indexOf("<p>") + 3, blogPostContent.indexOf("</p>") - 3));
+            } else {
+                $("#card-" + blogPostId).text(blogPostContent);
+            }
         }
     }
 </script>

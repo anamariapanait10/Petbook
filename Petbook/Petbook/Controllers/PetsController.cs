@@ -51,7 +51,7 @@ namespace Petbook.Controllers
                                 .Include("User")
                                 .Where(p => p.PetId == id)
                                 .First();
-
+            ViewBag.UserCurent = pet.UserId;
             return View(pet);
         }
 
@@ -154,12 +154,12 @@ namespace Petbook.Controllers
                 db.Pets.Remove(pet);
                 db.SaveChanges();
                 TempData["message"] = "The pet has been deleted";
-                return RedirectToAction("Index");
+                return Redirect("/ApplicationUsers/Show/" + pet.UserId);
             }
             else
             {
                 TempData["message"] = "Cannot delete the pets that aren't yours";
-                return RedirectToAction("Index");
+                return Redirect("/ApplicationUsers/Show/" + pet.UserId);
             }
         }
     }
