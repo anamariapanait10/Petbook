@@ -13,11 +13,12 @@ namespace Petbook.Models
 
         [Required(ErrorMessage = "The phone number is required")]
         public string PhoneNumber { get; set; }
-    
-        public virtual ICollection<Pet>? Pets { get; set; }
+
+        public virtual IList<Pet>? Pets { get; set; }
 
         public virtual ICollection<Comment>? Comments { get; set; }
         public virtual ICollection<ApplicationUser>? Followers { get; set; }
+        public virtual ICollection<ApplicationUser>? Following { get; set; }
 
         public virtual ICollection<BlogPost>? BlogPosts { get; set; }
 

@@ -209,9 +209,9 @@
                 contentType: "application/json; charset=utf-8",
                 success: function (res) {
                     var s = res.split("&");
-                    var new_comment = "<div class='d-flex'><img style='width:55px; height:55px' class='rounded-circle px-2 py-2 align-content-start' src='" +
-                        postPhoto + "'><p style='vertical-align: middle; margin: auto auto auto 0; text-align:left'>" +
-                        commentContent + "</p><span id=\"comment-icons-" + s[0] + "\" style=\"margin: auto 0 auto auto; text-align:left\"></span></div>";
+                    var new_comment = "<div class='d-flex' id='comment-div-" + s[0] + "'><img style='width:55px; height:55px' class='rounded-circle px-2 py-2 align-content-start' src='" +
+                        postPhoto + "'><span id='comment-content-" + s[0] + "' style='vertical-align: middle; margin: auto auto auto 0; text-align:left' > " +
+                        commentContent + "</span><span id=\"comment-icons-" + s[0] + "\" style=\"margin: auto 0 auto auto; text-align:left\"></span></div>";
                     $('#comments-scroll-' + postId).append(new_comment);
                     
  

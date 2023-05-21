@@ -162,7 +162,7 @@ button:focus {
             type: 'canvas',
             size: 'viewport'
         }).then(function (resp) {
-            if (resp != "data:,") { // this means that the user did not select a photo
+            if (resp != "data:,") { // this means that the user selected a photo
                 $('#photob64').val(resp);
             }
         });
