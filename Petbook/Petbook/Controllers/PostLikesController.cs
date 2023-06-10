@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 using Petbook.Data;
 using Petbook.Models;
 using System.Data;
@@ -46,7 +48,7 @@ namespace Petbook.Controllers
         [Authorize(Roles = "User,Admin")]
         [HttpPost("PostLikes/AddLike/{postId}")]
         public ActionResult<string> AddLike(int postId)
-        {   
+        {
             var postlike = db.PostLikes
                            .Where(p => p.PostId == postId && p.UserId == _userManager.GetUserId(User))
                            .FirstOrDefault();
@@ -55,10 +57,12 @@ namespace Petbook.Controllers
                 var p = new PostLike();
                 p.PostId = postId;
                 p.UserId = _userManager.GetUserId(User);
+                p.AddedDate = DateTime.Now;
                 db.PostLikes.Add(p);
                 db.SaveChanges();
                 return Ok("Post with id " + postId + " liked");
-            } else
+            }
+            else
             {
                 DeleteLike(postId);
                 return Ok("Post with id " + postId + " unliked");
@@ -78,5 +82,31 @@ namespace Petbook.Controllers
                 db.SaveChanges();
             }
         }
+
+        [Authorize(Roles = "User,Admin")]
+        public IActionResult ShowNotifications()
+        {
+            ViewBag.CurrentUser = _userManager.GetUserId(User);
+
+            var postIds = db.Posts.Include("Pet")
+                                .Include("Pet.User")
+                                .Include("PostLikes")
+                                .Include("Comments")
+                                .Include("Comments.User")
+                                .Where(p => p.Pet.UserId == _userManager.GetUserId(User))
+                                .OrderByDescending(p => p.PostDate)
+                                .Select(p => p.PostId)
+                                .ToList();
+
+
+            var postLikes = db.PostLikes
+                                 .Where(p => postIds.Any(id => id == p.PostId))
+                                 .OrderByDescending(p => p.AddedDate)
+                                 .ToList();
+            ViewBag.PostLikes = postLikes;
+
+            return View();
+        }
     }
 }
+

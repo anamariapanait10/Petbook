@@ -1,0 +1,8 @@
+﻿<div>
+    <p>Recent notifications</p>
+    @foreach(var postLike in ViewBag.PostLikes)
+    {
+        <div>@postLike.UserId</div>
+        <div>@postLike.AddedDate</div>
+    }
+</div>
