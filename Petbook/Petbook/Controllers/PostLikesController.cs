@@ -84,7 +84,7 @@ namespace Petbook.Controllers
         }
 
         [Authorize(Roles = "User,Admin")]
-        private IActionResult ShowNotifications()
+        public IActionResult ShowNotifications()
         {
             ViewBag.CurrentUser = _userManager.GetUserId(User);
 
@@ -97,7 +97,6 @@ namespace Petbook.Controllers
                                 .OrderByDescending(p => p.PostDate)
                                 .Select(p => p.PostId)
                                 .ToList();
-
 
 
             var postLikes = db.PostLikes
