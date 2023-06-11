@@ -59,7 +59,6 @@ namespace Petbook.Controllers
                             .Include("Posts")
                             .Include("User")
                             .Where(p => (p.PetName != null && p.PetName.ToLower().Contains(search))
-                                    || (p.Description != null && p.Description.ToLower().Contains(search))
                                     || (p.Category != null && p.Category.ToLower().Contains(search))
                                     || userNames.Contains(p.User.UserName)
                             )
