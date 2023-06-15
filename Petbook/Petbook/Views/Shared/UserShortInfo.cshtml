@@ -1,11 +1,11 @@
 ﻿@model ApplicationUser
 
 <div class="card-body">
-	<div style="float:left; width:40%;"><img src="@Model.ProfilePhoto" style="width:90%; margin-right:10px" /></div>
+	<div style="float:left; width:40%;"><img src="@Model.ProfilePhoto" class="rounded" style="width:90%; margin-right:10px" /></div>
 	<div style="float:left; font-size:12px; width:60%">
-		<span style="font-size:20px">@Model.UserName</span><br /><br />
+		<span style="font-size:20px"><a class="text-decoration-none" style="color: #eab676;" href="/ApplicationUsers/Show/@Model.Id"><b>@Model.UserName</b></a></span><br /><br />
 		Joined at @Model.JoinDate<br />
-		Phone: @Model.PhoneNumber
+		<b>Phone: </b>@Model.PhoneNumber
 		<a href="mailto: @Model.Email"><i class="bi bi-envelope" style="cursor:pointer; color:black;"></i></a>
 	</div>
 	<div style="clear:both;"></div>

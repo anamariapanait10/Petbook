@@ -1,9 +1,9 @@
 ﻿@model Petbook.Models.Pet
 
 <div class="card-body">
-	<div style="text-align:center"><h3>@Model.PetName</h3></div>
+	<div style="text-align:center"><h3><a class="text-decoration-none" style="color: #eab676;" href="/Pets/Show/@Model.PetId">@Model.PetName</a></h3></div>
 	<p>@Model.Description</p>
-	<span>Owner: </span>@Model.User.UserName<br />
+	<span><b>Owner: </b></span>@Model.User.UserName<br />
 	@if (Model.Posts != null)
 	{
 		var idx = 0;
@@ -13,7 +13,7 @@
 		{
 			if (idx >= 4)
 				break;
-			<img src="@post.PostPhoto" style="width:20%; margin-right:5px;" />
+			<img src="@post.PostPhoto" class="rounded" style="width:20%; margin-right:5px;" />
 			idx++;
 		}
 		</div>
@@ -23,7 +23,7 @@
 		<span style="font-size:11px;">0 posts</span>
 	}
 	<br />
-	<span>Category: </span>@Model.Category<br />
-	<span>Location: </span>@Model.Location<br />
+	<span><i class="bi bi-piggy-bank"></i> <b>Category: </b></span>@Model.Category<br />
+	<span><i class="bi bi-geo-alt"></i> <b>Location: </b></span>@Model.Location<br />
 	<div style="clear:both;"></div>
 </div>

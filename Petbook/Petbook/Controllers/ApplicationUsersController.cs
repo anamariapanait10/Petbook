@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Petbook.Data;
 using Petbook.Models;
+using System.Data;
 
 namespace Petbook.Controllers
 {
@@ -25,74 +27,64 @@ namespace Petbook.Controllers
 
         public IActionResult Index()
         {
-            var users = db.Users;
+            var users = db.ApplicationUsers;
             ViewBag.UsersList = users;
             return View();
         }
+        [Authorize(Roles = "User,Admin")]
 
-        public async Task<ActionResult> Show(string id)
+        public IActionResult Profile()
         {
-            ApplicationUser user = db.Users.Find(id);
-            var roles = await _userManager.GetRolesAsync(user);
+            return Redirect("/ApplicationUsers/Show/" + _userManager.GetUserId(User));
 
-            ViewBag.Roles = roles;
+        }
+
+        public async Task<ActionResult> Show(string id )
+        {
+            ApplicationUser user = db.ApplicationUsers.Include("Followers").Include("Following").Include("Pets").Where(u=>u.Id==id).First();
+            ViewBag.UserCurent = user.Id;
+            var roles = await _userManager.GetRolesAsync(user); 
 
             return View(user);
         }
 
-        public async Task<ActionResult> Edit(string id)
+        [Authorize(Roles = "User,Admin")]
+        public IActionResult Edit(string id)
         {
-            ApplicationUser user = db.Users.Find(id);
+            ApplicationUser user = db.ApplicationUsers
+                .Where(p => p.Id == id)
+                .First();
 
-            user.AllRoles = GetAllRoles();
-
-            // list of all role names
-            var roleNames = await _userManager.GetRolesAsync(user); 
-
-            // search the role id in the database
-            var currentUserRole = _roleManager.Roles
-                                              .Where(r => roleNames.Contains(r.Name))
-                                              .Select(r => r.Id)
-                                              .First();
-            ViewBag.UserRole = currentUserRole;
-            return View(user);
+            return View(user);           
         }
 
         [HttpPost]
-        public async Task<ActionResult> Edit(string id, ApplicationUser newData, [FromForm] string newRole)
+        [Authorize(Roles = "User,Admin")]
+        public IActionResult Edit(string id, ApplicationUser requestUser)
         {
-            ApplicationUser user = db.Users.Find(id);
+            ApplicationUser user = db.ApplicationUsers.Find(id);
 
             user.AllRoles = GetAllRoles();
 
             if (ModelState.IsValid)
             {
-                user.UserName = newData.UserName;
-                user.Email = newData.Email;
-                user.JoinDate = newData.JoinDate;
-                user.ProfilePhoto = newData.ProfilePhoto;
-                user.PhoneNumber = newData.PhoneNumber;
-
-                // search all roles from the db
-                var roles = db.Roles.ToList();
-
-                foreach (var role in roles)
-                {
-                    await _userManager.RemoveFromRoleAsync(user, role.Name);
-                }
-
-                var roleName = await _roleManager.FindByIdAsync(newRole);
-                await _userManager.AddToRoleAsync(user, roleName.ToString());
+                user.UserName = requestUser.UserName;
+                user.PhoneNumber = requestUser.PhoneNumber;
+                user.ProfilePhoto = requestUser.ProfilePhoto;
 
                 db.SaveChanges();
+                return Redirect("/ApplicationUsers/Show/"+id);
             }
-            return RedirectToAction("Index");
+            else
+            {
+                return Redirect("/ApplicationUsers/Show/" + id);
+            }
         }
 
         [HttpPost]
         public IActionResult Delete(string id)
         {
-            var user = db.Users
+            var user = db.ApplicationUsers
                          .Include("Pets")
                          .Include("Comments")
                          .Include("BlogPosts")

@@ -47,7 +47,7 @@ namespace Petbook.Controllers
         [Authorize(Roles = "User,Admin")]
         [HttpPost("PostLikes/AddLike/{postId}")]
         public ActionResult<string> AddLike(int postId)
-        {   
+        {
             var postlike = db.PostLikes
                            .Where(p => p.PostId == postId && p.UserId == _userManager.GetUserId(User))
                            .FirstOrDefault();
@@ -56,10 +56,12 @@ namespace Petbook.Controllers
                 var p = new PostLike();
                 p.PostId = postId;
                 p.UserId = _userManager.GetUserId(User);
+                p.AddedDate = DateTime.Now;
                 db.PostLikes.Add(p);
                 db.SaveChanges();
                 return Ok("Post with id " + postId + " liked");
-            } else
+            }
+            else
             {
                 DeleteLike(postId);
                 return Ok("Post with id " + postId + " unliked");
@@ -143,3 +145,4 @@ namespace Petbook.Controllers
         }
     }
 }
+

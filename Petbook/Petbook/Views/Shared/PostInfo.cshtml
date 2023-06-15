@@ -78,11 +78,12 @@
                             <span id="comment-icons-@comm.CommentId" style="margin: auto 0 auto auto; text-align:left"></span>
                         </div>
                         <script>
-                            var ci = $('#comment-icons-' + @comm.CommentId);
-
+                            
                             $.post("/Comments/checkIsCurrentUser/@comm.UserId", null, function (data, status) {
                                 if (status == "success") {
                                     if (data == "Yes") {
+                                        var ci = $('#comment-icons-' + @comm.CommentId);
+                                        console.log(ci);
                                         var stringHtml = "<i onclick=\"editComment(" + @comm.CommentId + "," + @Model.PostId + ")\" class=\"btn bi bi-pencil\" style=\"color:#2596be\"> </i>" +
                                             " <i onclick=\"deleteComment(" + @comm.CommentId + ")\" class=\"btn bi bi-trash3\" style=\"color:#be4d25\"> </i>";
                                         ci.html(stringHtml);
@@ -157,21 +158,30 @@
 
         cs.toggle();
         
+        var myModal = $('#myModal');
+        var modalDialog = $('.modal-dialog');
+
         if (cs.css('display') == 'none') {
             p.removeClass("col-6");
             pcard.css('width', '30vw');
             ci.css('transform', 'translateX(0)');
+            if (myModal) {
+                modalDialog.css('width', '32vw');
+            }
         } else {
             p.addClass("col-6");
             pcard.css('width', '62vw');
             ci.css('transform', 'translateX(32vw)');
+
+            if(myModal) {
+                modalDialog.css('width', '64vw');
+            }
         }
     });
 
     function recalculateDimensions() {
         var cs = $('#comment-section-' + @Model.PostId);
         var p = $('#postdiv-' + @Model.PostId);
-        var pcard = $('#postcard-' + @Model.PostId);
         var ci = $('#comment-input-' + @Model.PostId);
         var commentsScroll = $('#comments-scroll-' + @Model.PostId);
         var commentsDiv = $('#comments-div-' + @Model.PostId);
@@ -181,8 +191,9 @@
         var ci_height = parseInt(ci.css('height').substring(0, ci.css('height').length - 2));
         var cd_height = parseInt(commentsDiv.css('height').substring(0, commentsDiv.css('height').length - 2));
         commentsScroll.css('max-height', String(p_height - ci_height - cd_height) + 'px');
+        
     }
-
+    $(window).off('resize');
     $(window).on('resize', recalculateDimensions);
 
     var editingCommentId = -1;
@@ -197,11 +208,12 @@
                 data: JSON.stringify({ CommentContent: commentContent, PostId: postId }),
                 contentType: "application/json; charset=utf-8",
                 success: function (res) {
-                    var new_comment = "<div class='d-flex'><img style='width:55px; height:55px' class='rounded-circle px-2 py-2 align-content-start' src='" +
-                        postPhoto + "'><p style='vertical-align: middle; margin: auto auto auto 0; text-align:left'>" +
-                        commentContent + "</p></div>";
-                    $('#comments-scroll-' + postId).append(new_comment);
                     var s = res.split("&");
+                    var new_comment = "<div class='d-flex' id='comment-div-" + s[0] + "'><img style='width:55px; height:55px' class='rounded-circle px-2 py-2 align-content-start' src='" +
+                        postPhoto + "'><span id='comment-content-" + s[0] + "' style='vertical-align: middle; margin: auto auto auto 0; text-align:left' > " +
+                        commentContent + "</span><span id=\"comment-icons-" + s[0] + "\" style=\"margin: auto 0 auto auto; text-align:left\"></span></div>";
+                    $('#comments-scroll-' + postId).append(new_comment);
+                    
  
                     $.post("/Comments/checkIsCurrentUser/"+s[1], null, function (data, status) {
                         if (status == "success") {

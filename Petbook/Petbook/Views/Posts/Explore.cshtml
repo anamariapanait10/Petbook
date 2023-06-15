@@ -2,20 +2,46 @@
     ViewData["Title"] = "Petbook";
 }
 
-@if (ViewBag.Message != null)
-{
-    <h2 class="alert-success p-3 rounded-3 text-center mb-5">@ViewBag.Message</h2>
-}
 
-<br />
-
-
-@foreach (Petbook.Models.Post post in ViewBag.ExplorePosts)
-{
-    <div class="card" style="width:600px; margin:auto; text-align:center">
-        @Html.Partial("PostInfo", post )
-
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog" style="max-width: 100%; width: 30vw;">
+        <div class="modal-content">
+            <div class="modal-body">
+            </div>
+        </div>
     </div>
-    <br />
-    <br />
-}
+</div>
+
+<script>
+
+    function openPopup(Id) {
+        $.ajax({
+            type: "POST",
+            url: '/Posts/GetPopupContent/' + Id,
+            contentType: "application/text; charset=utf-8",
+            dataType: "text",
+            async: false,
+            success: function (data) {
+                $('.modal-body').html(data);
+                $("#myModal").modal("show");
+                $('#myModal').on('hidden.bs.modal', function () {
+                    var modalDialog = $('.modal-dialog');
+                    modalDialog.css('width', '32vw');
+                    $('#myModal').off('hidden.bs.modal');
+                })
+            }
+        })
+    }
+</script>
+
+<div class="row">
+    @foreach (var post in ViewBag.ExplorePosts)
+    {
+        <div class="col-md-4 mb-4"> 
+             <img onclick="openPopup(@post.PostId)" src="@post.PostPhoto" alt="Post Photo" class="w-100 h-100 rounded">
+        </div>
+    }
+</div>
+
+
+
