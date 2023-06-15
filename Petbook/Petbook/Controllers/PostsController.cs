@@ -32,6 +32,20 @@ namespace Petbook.Controllers
         [Authorize(Roles = "User,Admin")]
         public IActionResult Index()
         {
+            /*
+            var userId = _userManager.GetUserId(User);
+            var user = db.ApplicationUsers
+                                    .Include("Following")
+                                    .Where(u => u.Id == userId)
+                                    .First();
+            
+
+            var posts = new List<Post>();
+               foreach(var u in user.Following)
+            {
+
+            }
+            */
             var posts = db.Posts.Include("Pet")
                                 .Include("Pet.User")
                                 .Include("PostLikes")
