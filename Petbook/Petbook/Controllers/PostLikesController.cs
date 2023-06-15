@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Petbook.Data;
 using Petbook.Models;
@@ -89,21 +88,58 @@ namespace Petbook.Controllers
             ViewBag.CurrentUser = _userManager.GetUserId(User);
 
             var postIds = db.Posts.Include("Pet")
-                                .Include("Pet.User")
-                                .Include("PostLikes")
-                                .Include("Comments")
-                                .Include("Comments.User")
                                 .Where(p => p.Pet.UserId == _userManager.GetUserId(User))
                                 .OrderByDescending(p => p.PostDate)
                                 .Select(p => p.PostId)
                                 .ToList();
 
-
-            var postLikes = db.PostLikes
-                                 .Where(p => postIds.Any(id => id == p.PostId))
-                                 .OrderByDescending(p => p.AddedDate)
+            if (postIds.Count > 0)
+            {
+                //comments
+                var postNotifications = db.Comments
+                                 .Include("User")
+                                 .Include("Post")
+                                 .Include("Post.Pet")
+                                 .Where(p => postIds.Contains((int)p.PostId))
+                                 .Where(p => p.UserId != _userManager.GetUserId(User))
+                                 .Select(p => new Comment
+                                 {
+                                     CommentId = p.CommentId,
+                                     PostId = p.PostId,
+                                     CommentContent = "commented on ",
+                                     CommentDate = p.CommentDate,
+                                     User = p.User,
+                                     Post = p.Post
+                                 })
                                  .ToList();
-            ViewBag.PostLikes = postLikes;
+
+                //likes
+                postNotifications.AddRange(
+                                db.PostLikes
+                                 .Include("User")
+                                 .Include("Post")
+                                 .Include("Post.Pet")
+                                 .Where(p => postIds.Contains((int)p.PostId))
+                                 .Where(p => p.UserId != _userManager.GetUserId(User))
+                                 .Select(p => new Comment
+                                 {
+                                     CommentId = 0,
+                                     PostId = p.PostId,
+                                     CommentContent = "liked ",
+                                     CommentDate = p.AddedDate.HasValue ? p.AddedDate.Value : p.Post.PostDate.Value,
+                                     User = p.User,
+                                     Post = p.Post
+                                 })
+                                 .ToList()
+                                 );
+
+                //order notifications by date desc
+                ViewBag.PostNotifications = postNotifications.OrderByDescending(n => n.CommentDate).ToList();
+            }
+            else
+            {
+                ViewBag.ErrorMessage = "No notifications";
+            }
 
             return View();
         }
