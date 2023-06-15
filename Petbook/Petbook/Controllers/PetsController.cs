@@ -68,14 +68,15 @@ namespace Petbook.Controllers
         [Authorize(Roles = "User,Admin")]
         [HttpPost]
         public IActionResult New(Pet pet)
-        {
+        {   
+            pet.UserId = _userManager.GetUserId(User);
 
             if (ModelState.IsValid)
             {
                 db.Pets.Add(pet);
                 db.SaveChanges();
                 TempData["message"] = "The pet was added";
-                return RedirectToAction("Index");
+                return Redirect("/ApplicationUsers/Show/"+pet.UserId);
             }
             else
             {
@@ -93,16 +94,7 @@ namespace Petbook.Controllers
                             .Where(p => p.PetId == id)
                             .First();
 
-            // edit only the pets that are owned by the current user
-            if (pet.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
-            {
-                return View(pet);
-            }
-            else
-            {
-                TempData["message"] = "Cannot edit the pets that aren't yours";
-                return RedirectToAction("Index");
-            }
+            return View(pet);
         }
 
         // add the modified pet in the db
@@ -118,21 +110,14 @@ namespace Petbook.Controllers
 
             if (ModelState.IsValid)
             {
-                if (pet.UserId == _userManager.GetUserId(User) || User.IsInRole("Admin"))
-                {   
-                    pet.PetName = requestPet.PetName;
-                    pet.Category= requestPet.Category;
-                    pet.Description = requestPet.Description;
-                    pet.Location = requestPet.Location;
-                    TempData["message"] = "The pet has been modified";
-                    db.SaveChanges();
-                    return RedirectToAction("Index");
-                }
-                else
-                {
-                    TempData["message"] = "Cannot edit the pets that aren't yours";
-                    return RedirectToAction("Index");
-                }
+                pet.PetName = requestPet.PetName;
+                pet.Category= requestPet.Category;
+                pet.Description = requestPet.Description;
+                pet.Location = requestPet.Location;
+                pet.PetPhoto = requestPet.PetPhoto;
+                TempData["message"] = "The pet has been modified";
+                db.SaveChanges();
+                return Redirect("/Pets/Show/" + pet.PetId);  
             }
             else
             {

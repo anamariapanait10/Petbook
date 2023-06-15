@@ -35,7 +35,7 @@
 <div class="card mt-3">
     <div class="card-body d-flex justify-content-between col">
         <div class="text-center">
-            <img src=@Model.PetPhoto class="rounded-circle w-75" alt="Pet image">
+            <img src=@Model.PetPhoto class="rounded-circle" style="width:300px" alt="Pet image">
         </div>
 
         <div class="card-body d-flex justify-content-between row mx-4 px-5" style="border-left:solid; border-color: lightgray">
@@ -65,6 +65,14 @@
             }
         </div>
     </div>
+    @*
+    @if (@Model.UserId == ViewBag.UserCurent)
+    {
+        <div style="text-align:right" class="px-4 pb-3">
+            <a class="btn" style="border-color:#eab676; background-color: #eab676; color:white" href="/Posts/New">Add a post</a>
+        </div>
+    }
+    *@
 </div>
 
 <div>

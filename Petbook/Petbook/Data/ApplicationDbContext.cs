@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Petbook.Models;
+using System.Collections.Generic;
 
 namespace Petbook.Data
 {
@@ -23,6 +24,19 @@ namespace Petbook.Data
         public DbSet<PostLike> PostLikes { get; set; }
         public DbSet<Tag> Tags { get; set; }
 
+        // Mock lists used for tests
+        public List<Object> roles { get; set;  } 
+        public List<Object> users { get; set; }
+        public List<Object> pets { get; set; }
+        public List<Object> posts { get; set; }
+        public List<Object> postlikes { get; set; }
+        public List<Object> comments { get; set; }
+        public List<Object> commentLikes { get; set; }
+        public List<Object> blogPosts { get; set; }
+        public List<Object> blogPostLikes { get; set; }
+        public List<Object> tags { get; set; }
+        public List<Object> blogPostTags { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
@@ -33,7 +47,7 @@ namespace Petbook.Data
                 .HasKey(bpt => new { bpt.BlogPostTagId, bpt.BlogPostId, bpt.TagId });
 
             modelBuilder.Entity<BlogPostLike>()
-               .HasKey(bpt => new { bpt.BlogPostId, bpt.UserId });
+               .HasKey(bpl => new { bpl.BlogPostId, bpl.UserId });
 
             modelBuilder.Entity<CommentLike>()
                .HasKey(bpt => new { bpt.CommentId, bpt.UserId });
@@ -51,6 +65,16 @@ namespace Petbook.Data
                 .HasOne(bpt => bpt.Tag)
                 .WithMany(bpt => bpt.BlogPostTags)
                 .HasForeignKey(bpt => bpt.TagId);
+
+            modelBuilder.Entity<BlogPostLike>()
+               .HasOne(bpt => bpt.BlogPost)
+               .WithMany(bpt => bpt.BlogPostLikes)
+               .HasForeignKey(bpt => bpt.BlogPostId);
+
+            modelBuilder.Entity<BlogPostLike>()
+                .HasOne(bpt => bpt.User)
+                .WithMany(bpt => bpt.BlogPostLikes)
+                .HasForeignKey(bpt => bpt.UserId);
         }
 
         private void CreateDbSetMock(List<List<Object>> initialEntities)
@@ -160,25 +184,30 @@ namespace Petbook.Data
         public void PopulateDb(int num)
         {
             List<List<Object>> list = GetRandomListOfApplicationUsers(num);
-            List<Object> users = list[0];
-            List<Object> pets = GetRandomListOfPets(users, num * 2);
+            users = list[0];
+            pets = GetRandomListOfPets(users, num * 2);
             list.Add(pets);
-            List<Object> posts = GetRandomListOfPosts(pets, num * 4);
+            posts = GetRandomListOfPosts(pets, num * 4);
             list.Add(posts);
-            List<Object> postlikes = GetRandomListOfPostLikes(users, posts, num * 5);
+            postlikes = GetRandomListOfPostLikes(users, posts, num * 5);
             list.Add(postlikes);
-            List<Object> comments = GetRandomListOfComments(users, posts, num * 6);
+            comments = GetRandomListOfComments(users, posts, num * 6);
             list.Add(comments);
-            List<Object> commentLikes = GetRandomListOfCommentLikes(users, comments, num * 6);
+            commentLikes = GetRandomListOfCommentLikes(users, comments, num * 6);
             list.Add(commentLikes);
-            List<Object> blogPosts = GetRandomListOfBlogPosts(users, num);
+            blogPosts = GetRandomListOfBlogPosts(users, num);
             list.Add(blogPosts);
-            List<Object> blogPostLikes = GetRandomListOfBlogPostLikes(users, blogPosts, num * 6);
+            blogPostLikes = GetRandomListOfBlogPostLikes(users, blogPosts, num * 6);
             list.Add(blogPostLikes);
-            List<Object> tags = GetRandomListOfTags(num);
+            tags = GetRandomListOfTags(num);
             list.Add(tags);
-            List<Object> blogPostTags = GetRandomListOfBlogPostTags(tags, blogPosts, num * 7);
+            blogPostTags = GetRandomListOfBlogPostTags(tags, blogPosts, num * 7);
             list.Add(blogPostTags);
+            roles = list[1];
+            List<List<Object>> initialEntities = new List<List<Object>>();
+            initialEntities.AddRange(new List<List<Object>> { roles, users, pets, posts, postlikes, comments, commentLikes, blogPosts, blogPostLikes, tags, blogPostTags });
+            CreateDbSetMock(initialEntities);
+
         }
         private string GenerateHash()
         {
@@ -208,7 +237,8 @@ namespace Petbook.Data
                     NormalizedEmail = "USER" + i + "@TEST.COM",
                     Email = "user" + i + "@test.com",
                     NormalizedUserName = "USER" + i + "@TEST.COM",
-                    PasswordHash = hasher.HashPassword(null, "User" + i + "!")
+                    PasswordHash = hasher.HashPassword(null, "User" + i + "!"),
+                    PhoneNumber = "0712345678",
                 };
                 users.Add(user);
                 if (i % 2 == 0)
@@ -245,7 +275,7 @@ namespace Petbook.Data
             {
                 var pet = new Pet
                 {
-                    PetId = i,
+                    PetId = i + 1,
                     UserId = (users[random.Next(users.Count)] as ApplicationUser).Id,
                     PetName = "Pet " + i,
                     Category = categ[random.Next(categ.Length)],
@@ -268,7 +298,7 @@ namespace Petbook.Data
             {
                 var post = new Post
                 {
-                    PostId = i,
+                    PostId = i + 1,
                     PetId = (pets[random.Next(pets.Count)] as Pet).PetId,
                     PostPhoto = imgs[random.Next(imgs.Length)],
                     Description = "Description " + i,
@@ -287,10 +317,10 @@ namespace Petbook.Data
             {
                 var blogpost = new BlogPost
                 {
-                    BlogPostId = i,
+                    BlogPostId = i + 1,
                     UserId = (users[random.Next(users.Count)] as ApplicationUser).Id,
-                    BlogPostContent = "content" + i
-
+                    BlogPostContent = "content" + i,
+                    BlogPostTitle = "title" + i,
                 };
                 blogposts.Add(blogpost);
             }
@@ -309,7 +339,10 @@ namespace Petbook.Data
                     UserId = (users[random.Next(users.Count)] as ApplicationUser).Id,
                     BlogPostId = (blogPosts[random.Next(blogPosts.Count)] as BlogPost).BlogPostId,
                 };
-                blogPostLikes.Add(blogPostLike);
+                if (!blogPostLikes.Any(l => ((BlogPostLike)l).UserId == blogPostLike.UserId && ((BlogPostLike)l).BlogPostId == blogPostLike.BlogPostId))
+                {
+                    blogPostLikes.Add(blogPostLike);
+                }
             }
             return blogPostLikes;
 
@@ -324,7 +357,7 @@ namespace Petbook.Data
             {
                 var tag = new Tag
                 {
-                    TagId = i,
+                    TagId = i + 1,
                     TagName = "tag" + i,
                 };
                 tags.Add(tag);
@@ -362,7 +395,10 @@ namespace Petbook.Data
                     UserId = (users[random.Next(users.Count)] as ApplicationUser).Id,
                     PostId = (posts[random.Next(posts.Count)] as Post).PostId,
                 };
-                blogPostLikes.Add(postLike);
+                if (!blogPostLikes.Any(l => ((PostLike)l).UserId == postLike.UserId && ((PostLike)l).PostId == postLike.PostId))
+                {
+                    blogPostLikes.Add(postLike);
+                }
             }
             return blogPostLikes;
         }
@@ -401,7 +437,10 @@ namespace Petbook.Data
                     UserId = (users[random.Next(users.Count)] as ApplicationUser).Id,
                     CommentId = (comments[random.Next(comments.Count)] as Comment).CommentId
                 };
-                commentLikes.Add(commentLike);
+                if(!commentLikes.Any(l => ((CommentLike) l).UserId == commentLike.UserId && ((CommentLike)l).CommentId == commentLike.CommentId))
+                {
+                    commentLikes.Add(commentLike);
+                }
             }
             return commentLikes;
 

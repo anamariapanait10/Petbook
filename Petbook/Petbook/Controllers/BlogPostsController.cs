@@ -31,6 +31,7 @@ namespace Petbook.Controllers
             ViewBag.Tags = allTags;
             ViewBag.SearchString = search;
             ViewBag.ShowViewBtn = true;
+            ViewBag.ShowAllText = false;
 
             if (TempData.ContainsKey("message"))
             {
@@ -65,6 +66,7 @@ namespace Petbook.Controllers
             ViewBag.Tags = tags;
             ViewBag.ShowViewBtn = false;
             ViewBag.CurrentUser = _userManager.GetUserId(User);
+            ViewBag.ShowAllText = true;
             if (User.IsInRole("User"))
             {
                 var blogPosts = db.BlogPosts

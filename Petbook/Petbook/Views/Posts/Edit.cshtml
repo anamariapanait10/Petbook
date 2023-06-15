@@ -3,83 +3,74 @@
 @*this code was taken from this site https://github.com/foliotek/croppie*@
 <style>
 
-input[type="file"] {
-    cursor: pointer;
-}
-button:focus {
-    outline: 0;
-}
+    input[type="file"] {
+        cursor: pointer;
+    }
 
-.file-btn {
-    position: relative;
-}
-.file-btn input[type="file"] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-}
+    button:focus {
+        outline: 0;
+    }
 
-.upload-demo .upload-demo-wrap,
-.upload-demo .upload-result,
-.upload-demo.ready .upload-msg {
-    display: none;
-}
-.upload-demo.ready .upload-demo-wrap {
-    display: block;
-}
-.upload-demo.ready .upload-result {
-    display: inline-block;    
-}
-.upload-demo-wrap {
-    width: 400px;
-    height: 400px;
-    margin: 10px auto;
-}
+    .file-btn {
+        position: relative;
+    }
 
-.upload-msg {
-    text-align: center;
-    padding: auto;
-    font-size: 22px;
-    color: #aaa;
-    width: 400px;
-    height: 400px;
-    margin: 10px auto;
-    border: 1px solid #aaa;
-}
+        .file-btn input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+    .upload-demo .upload-demo-wrap,
+    .upload-demo .upload-result,
+    .upload-demo.ready .upload-msg {
+        display: none;
+    }
+
+    .upload-demo.ready .upload-demo-wrap {
+        display: block;
+    }
+
+    .upload-demo.ready .upload-result {
+        display: inline-block;
+    }
+
+    .upload-demo-wrap {
+        width: 400px;
+        height: 400px;
+        margin: 10px auto;
+    }
+
+    .upload-msg {
+        text-align: center;
+        padding: auto;
+        font-size: 22px;
+        color: #aaa;
+        width: 400px;
+        height: 400px;
+        margin: 10px auto;
+        border: 1px solid #aaa;
+    }
 
 </style>
 
+<h2 class="text-center mt-3">Edit post</h2>
 
 <div class="container mt-3">
     <div class="row">
-        <div class="col-6 offset-3 border" style="border-radius:0.3rem">
+        <div class="col-md-6 offset-3">
 
-            <ul class="nav nav-tabs mt-3">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/Posts/New">Create a new post</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/BlogPosts/New">Create a new blog post</a>
-                </li>
-            </ul>
-            <br />
-             
-            @using (Html.BeginForm(actionName: "New", controllerName: "Posts", method: FormMethod.Post))
+            @using (Html.BeginForm(actionName: "Edit", controllerName: "Posts",
+            method: FormMethod.Post,
+            routeValues: new { id = Model.PostId }))
             {
-               <div class="form-group">
-                    @Html.LabelFor(model => model.PetId, " Select the pet", new { @class = "control-label" })
-                    @Html.DropDownListFor(m => m.PetId, new SelectList(Model.Pets, "Value", "Text"),
-                    "Select the pet", new { @class = "form-control" })
-                    @Html.ValidationMessageFor(model => model.PetId, null, new { @class = "text-danger" })
-                </div>
-                <br />
 
+                @Html.HiddenFor(m => m.PetId, new {@Value=@Model.PetId})
                 <div class="form-group">
-                    @Html.LabelFor(model => model.PostPhoto, " Upload an image", new { @class = "control-label" })
-
+                    @Html.LabelFor(model => model.PostPhoto, " Change the image", new { @class = "control-label" })
                     <div class="demo-wrap upload-demo">
                         <div id="upload_button">
                             <a class="btn file-btn upload-msg" style="display: flex; align-items: center; justify-content: center;">
@@ -89,29 +80,28 @@ button:focus {
                         </div>
                         <div class="upload-demo-wrap">
                             <div id="upload-demo"></div>
-                        </div>    
+                        </div>
                     </div>
-                    
                     <input id="photob64" type="text" style="display: none" asp-for="PostPhoto"></input>
                     @Html.ValidationMessageFor(model => model.PostPhoto, null, new { @class = "text-danger" })
                 </div>
-                <br />
+
                 <div class="form-group">
                     @Html.LabelFor(model => model.Description, " Description", new { @class = "control-label" })
-                    @Html.TextBoxFor(model => model.Description, new { @class = "form-control summernote" })
+                    @Html.TextAreaFor(model => Model.Description, new { @class = "form-control summernote" })
                     @Html.ValidationMessageFor(model => model.Description, null, new { @class = "text-danger" })
                 </div>
-                
+
                 <div class="form-group mt-4">
                     <div class="d-flex col justify-content-between">
-                        <a class="btn btn-danger" href="/Posts/Index">Cancel</a>
-                        <input type="submit" value="Share" class="btn btn-primary upload-result"/>
+                        <a class="btn btn-danger" href="/Pets/Show/@Model.PetId">Cancel</a>
+                        <input type="submit" value="Edit" class="btn btn-primary upload-result" />
                     </div>
                 </div>
                 <br />
                 <br />
             }
-            
+
         </div>
     </div>
 </div>

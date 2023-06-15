@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Petbook.Migrations
 {
-    public partial class migration1 : Migration
+    public partial class v1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -199,6 +199,7 @@ namespace Petbook.Migrations
                     BlogPostId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    BlogPostTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BlogPostContent = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -290,7 +291,7 @@ namespace Petbook.Migrations
                 {
                     PostId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PetId = table.Column<int>(type: "int", nullable: true),
+                    PetId = table.Column<int>(type: "int", nullable: false),
                     PostPhoto = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PostDate = table.Column<DateTime>(type: "datetime2", nullable: true)
@@ -302,7 +303,8 @@ namespace Petbook.Migrations
                         name: "FK_Posts_Pets_PetId",
                         column: x => x.PetId,
                         principalTable: "Pets",
-                        principalColumn: "PetId");
+                        principalColumn: "PetId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

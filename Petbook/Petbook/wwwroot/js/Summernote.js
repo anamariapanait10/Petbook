@@ -1,7 +1,7 @@
 ﻿$(document).ready(function () {
     $('.summernote').summernote({
-        height: 300,
-        minHeight: 200,
+        height: 200,
+        minHeight: 100,
         focus: true,
     });
 });
