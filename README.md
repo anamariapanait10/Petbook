@@ -54,7 +54,8 @@ the functionality was ready. You can find the list of all branches created [here
 - The list of all commits can be found [here](https://github.com/anamariapanait10/Petbook/commits/main).
 
 ## Automated tests
-- For testing we implemented several unit tests for pets controller to check that the CRUD operations work correctly. 
+- For testing we implemented several unit tests for pets controller to check that the CRUD operations work correctly.
+
 ![image](https://github.com/anamariapanait10/Petbook/blob/main/automated_tests.jpeg)
 
 ## Bug report
