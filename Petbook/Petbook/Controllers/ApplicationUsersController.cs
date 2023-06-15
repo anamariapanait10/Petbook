@@ -33,6 +33,30 @@ namespace Petbook.Controllers
         }
         [Authorize(Roles = "User,Admin")]
 
+<<<<<<< Updated upstream
+=======
+            ViewBag.Followers = user.Followers;
+            return View();
+        }
+
+        [HttpPost("/ApplicationUsers/FollowUserById/{userId}")]
+        [Authorize(Roles = "User,Admin")]
+        public void FollowUserById([FromRoute] String userId)
+        {
+            var currenUserId = _userManager.GetUserId(User);
+            var currentUser = db.ApplicationUsers
+                        .Include("Followers")
+                        .Where(u => u.Id == currenUserId)
+                        .First();
+            var followingUser = db.ApplicationUsers
+                        .Where(u => u.Id == userId)
+                        .First();
+            currentUser.Following.Add(followingUser);
+            db.SaveChanges();
+        }
+
+        [Authorize(Roles = "User,Admin")]
+>>>>>>> Stashed changes
         public IActionResult Profile()
         {
             return Redirect("/ApplicationUsers/Show/" + _userManager.GetUserId(User));
