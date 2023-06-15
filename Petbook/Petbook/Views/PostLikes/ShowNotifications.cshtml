@@ -1,30 +1,40 @@
 ﻿<style>
     .blog-card {
-        left: 25%;
+        left: 100%;
         width: 50%;
+    }
+
+    .container-1{
+        left:50%;
     }
 </style>
 <div>
-    @if (ViewBag != null)
-    {
-        <h3>Recent notifications</h3>
-        @if (ViewBag.PostNotifications == null || ViewBag.PostNotifications.Count == 0)
+    <div class="container container-1" style="width: 100%;">
+        <div style="width: 80%; float: right">
+        @if (ViewBag != null)
         {
-            <div>0 notifications</div>
-        }
-        else
-            @foreach (var postNotif in ViewBag.PostNotifications)
-    {
-                <div class="card1 blog-card">
-                    <div class="card-body">
-                        <div style="float:left; max-width:50px"><img src="@postNotif.User.ProfilePhoto" class="rounded-circle px-2 py-2 align-content-start" style="width:90%; margin-right:10px" /></div>
-                        <div style="float:left; font-size:14px; min-width:80%">
-                            @postNotif.User.UserName @postNotif.CommentContent your post <b>@postNotif.Post.Pet.PetName</b><br />
-                            @postNotif.CommentDate
-                        </div>
-                        <div style="clear:both;"></div>
-                    </div>
-                </div>
+            <h3 style="color:#eab676;">Recent notifications</h3>
+            @if (ViewBag.PostNotifications == null || ViewBag.PostNotifications.Count == 0)
+            {
+                <div>0 notifications</div>
             }
-    }
+            else
+                @foreach (var postNotif in ViewBag.PostNotifications)
+                {
+                    <div class="card1 blog-card">
+                        <div class="card-body">
+                            <div style="float:left; max-width:50px"><img src="@postNotif.User.ProfilePhoto" class="rounded-circle px-2 py-2 align-content-start" style="width:90%; margin-right:10px" /></div>
+                            <div style="float:left; font-size:14px; min-width:80%">
+                                @postNotif.User.UserName @postNotif.CommentContent your post <b>@postNotif.Post.Pet.PetName</b><br />
+                                @postNotif.CommentDate
+                            </div>
+                            <div style="clear:both;"></div>
+                        </div>
+                    </div>
+                }
+        }
+        </div>
+    </div>
+
 </div>
+

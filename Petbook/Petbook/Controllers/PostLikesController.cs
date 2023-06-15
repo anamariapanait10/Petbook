@@ -82,6 +82,7 @@ namespace Petbook.Controllers
             }
         }
 
+        //method to show all notifications that a user receives, sorted by date
         [Authorize(Roles = "User,Admin")]
         public IActionResult ShowNotifications()
         {
@@ -95,7 +96,7 @@ namespace Petbook.Controllers
 
             if (postIds.Count > 0)
             {
-                //comments
+                //comments notifications
                 var postNotifications = db.Comments
                                  .Include("User")
                                  .Include("Post")
@@ -113,7 +114,7 @@ namespace Petbook.Controllers
                                  })
                                  .ToList();
 
-                //likes
+                //likes notifications
                 postNotifications.AddRange(
                                 db.PostLikes
                                  .Include("User")
