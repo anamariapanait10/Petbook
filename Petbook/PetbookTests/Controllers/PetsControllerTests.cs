@@ -9,14 +9,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Mvc;
 using Assert = Microsoft.VisualStudio.TestTools.UnitTesting.Assert;
+using System.Security.Claims;
 
 namespace Petbook.Controllers.Tests
 {
     [TestClass()]
     public class PetsControllerTests
     {
-        private PetsController controller;
-        private ApplicationDbContext db;
+        private static PetsController controller;
+        private static ApplicationDbContext db;
 
         [TestInitialize]
         public void SetUp()
@@ -43,10 +44,17 @@ namespace Petbook.Controllers.Tests
             }
             return db;
         }
+ 
         private PetsController GetController()
-        {
+        {   
+            // create a mock admin user
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
+                new Claim(ClaimTypes.NameIdentifier, "admin"),
+                new Claim(ClaimTypes.Name, "admin@admin.com"),
+                new Claim(ClaimTypes.Role, "Admin")
+            }, "TestAuthentication"));
             // create a mock controller with a session variable
-            var httpContext = new DefaultHttpContext();
+            var httpContext = new DefaultHttpContext { User = user };
             var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
             tempData["SessionVariable"] = "admin";
             var userStore = new Mock<IUserStore<ApplicationUser>>();
@@ -54,7 +62,8 @@ namespace Petbook.Controllers.Tests
             var userManager = new Mock<UserManager<ApplicationUser>>(userStore.Object, null, null, null, null, null, null, null, null);
             var roleManager = new Mock<RoleManager<IdentityRole>>(roleStore.Object, null, null, null, null);
             var controller = new PetsController(db, userManager.Object, roleManager.Object) { TempData = tempData };
-
+            controller.ControllerContext = new ControllerContext();
+            controller.ControllerContext.HttpContext = httpContext;
             return controller;
         }
 
