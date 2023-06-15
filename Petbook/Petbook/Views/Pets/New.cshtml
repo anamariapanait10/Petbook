@@ -57,14 +57,13 @@
 
 </style>
 
-<h2 class="text-center mt-5">Edit pet</h2>
+<h2 class="text-center mt-5">Add a pet</h2>
 
 <div class="container mt-3">
     <div class="row">
         <div class="col-md-6 offset-3">
-            @using (Html.BeginForm(actionName: "Edit", controllerName: "Pets",
-            method: FormMethod.Post,
-            routeValues: new { id = Model.PetId }))
+            @using (Html.BeginForm(actionName: "New", controllerName: "Pets",
+            method: FormMethod.Post))
             {
 
                 @Html.Label("PetName", "Pet Name")
@@ -92,9 +91,8 @@
                 @Html.Editor("Location", new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(m => m.Location, null, new { @class = "text-danger" })
                 <br />
-
                 <div class="form-group">
-                    @Html.LabelFor(model => model.PetPhoto, " Change profile image", new { @class = "control-label" })
+                    @Html.LabelFor(model => model.PetPhoto, " Add pet image", new { @class = "control-label" })
 
                     <div class="demo-wrap upload-demo">
                         <div id="upload_button">
@@ -113,7 +111,7 @@
                 </div>
 
                 <div style="text-align:right">
-                    <button class="btn btn-success upload-result" type="submit">Edit</button>
+                    <button class="btn btn-success upload-result" type="submit">New</button>
                 </div>
             }
         </div>

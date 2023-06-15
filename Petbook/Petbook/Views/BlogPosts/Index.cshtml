@@ -18,8 +18,8 @@
     }
 
     .blog-card {
-        left: 25%;
-        width: 50%;
+        left: 20%;
+        width: 60%;
     }
 
     .file-btn {
@@ -124,7 +124,8 @@
 }
 
 <div>
-    <div style="width:600px; margin:auto; text-align:center; width: calc(30vw - 2px);">
+
+    <div style="margin:auto; text-align:center; width: calc(30vw - 2px);">
         <ul class="nav nav-tabs mt-3">
             <li class="nav-item">
                 <a class="nav-link" href="/Posts/Index">Posts</a>
@@ -135,13 +136,16 @@
         </ul>
     </div>
     <br />
-    <form method="GET">
-        <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Search by tags" name="search"
-                   value="@ViewBag.SearchString">
-            <button class="btn btn-primary upload-result" style="float: right; border-color:#eab676; background-color: #eab676;" type="submit">Search</button>
-        </div>
-    </form>
+    <div style="margin:auto; text-align:center; width: calc(46vw);">
+        <form method="GET">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Search by tags" name="search"
+                       value="@ViewBag.SearchString">
+                <button class="btn btn-primary upload-result" style="float: right; border-color:#eab676; background-color: #eab676;" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+
     <br />
     <br />
     @foreach (Petbook.Models.BlogPost blogPost in ViewBag.BlogPosts)

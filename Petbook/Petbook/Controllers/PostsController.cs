@@ -1,14 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Petbook.Data;
 using Petbook.Models;
-using System.ComponentModel.DataAnnotations;
-using System.IO.Compression;
-using System.Xml.Linq;
 
 namespace Petbook.Controllers
 {
@@ -76,13 +72,7 @@ namespace Petbook.Controllers
             return View();
         }
 
-        // display a post in a popup window with its comments and likes
-        [Authorize(Roles = "User,Admin")]
-        public IActionResult PopupPost(int postId)
-        {
-            return View();
-        }
-
+ 
         // displays a post with the given id
         // with its comments, likes, the pet who posted it
         // and the user who posted each comment
@@ -96,6 +86,8 @@ namespace Petbook.Controllers
                                 .Include("Comments.User")
                                 .Where(p => p.PostId == id)
                                 .First();
+          
+            ViewBag.UserCurent = post.Pet.UserId;
             return View(post);
         }
 
@@ -223,17 +215,20 @@ namespace Petbook.Controllers
                     post.PostDate = requestPost.PostDate;
                     TempData["message"] = "The post has been modified";
                     db.SaveChanges();
-                    return RedirectToAction("Show/" + id);
+                    return Redirect("/Pets/Show/" + post.Pet.PetId);
                 }
                 else
                 {
                     post.Pets = GetPetsOfCurrentUser();
                     TempData["message"] = "Cannot edit the posts that aren't yours";
-                    return RedirectToAction("Show/" + id);
+                    return Redirect("/Pets/Show/" + post.Pet.PetId);
                 }
             }
             else
             {
+                var errors = ModelState.Select(x => x.Value.Errors)
+                           .Where(y => y.Count > 0)
+                           .ToList();
                 return View(requestPost);
             }
         }
@@ -251,12 +246,12 @@ namespace Petbook.Controllers
                 db.Posts.Remove(post);
                 db.SaveChanges();
                 TempData["message"] = "The post has been deleted";
-                return RedirectToAction("Index");
+                return Redirect("/Pets/Show/" + post.Pet.PetId);
             }
             else
             {
                 TempData["message"] = "Cannot delete the posts that aren't yours";
-                return RedirectToAction("Index");
+                return Redirect("/Pets/Show/" + post.Pet.PetId);
             }
         }
 

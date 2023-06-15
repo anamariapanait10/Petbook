@@ -12,8 +12,8 @@ using Petbook.Data;
 namespace Petbook.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230316114628_migration1")]
-    partial class migration1
+    [Migration("20230522103401_v1")]
+    partial class v1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -260,6 +260,10 @@ namespace Petbook.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("BlogPostTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
@@ -402,6 +406,7 @@ namespace Petbook.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("PetId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("PostDate")
@@ -611,7 +616,9 @@ namespace Petbook.Migrations
                 {
                     b.HasOne("Petbook.Models.Pet", "Pet")
                         .WithMany("Posts")
-                        .HasForeignKey("PetId");
+                        .HasForeignKey("PetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Pet");
                 });
