@@ -75,6 +75,12 @@ namespace Petbook.Data
                 .HasOne(bpt => bpt.User)
                 .WithMany(bpt => bpt.BlogPostLikes)
                 .HasForeignKey(bpt => bpt.UserId);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(com => com.Post)
+                .WithMany(com => com.Comments)
+                .HasForeignKey(com => com.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private void CreateDbSetMock(List<List<Object>> initialEntities)
