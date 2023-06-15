@@ -1,6 +1,10 @@
 # Petbook :dog2:
-Social media platform for pet owners where you can share photos and stories about your pets.
 
+`Petbook` is a unique social media platform specifically designed for pet owners to connect, share, and engage with fellow pet enthusiasts. With a focus on pets, this app provides a dedicated space where users can showcase their furry friends, exchange stories, seek advice, and build a vibrant community of pet lovers.
+
+
+### Technical Implementation  :wrench::
+The app is developed using the `C#` programming language and the `ASP.NET Core MVC` framework, providing a scalable and secure architecture. `SQL Server` is utilized as the database management system, ensuring efficient storage and retrieval of user data.
 
 ### Project made by:
 
@@ -37,24 +41,66 @@ Social media platform for pet owners where you can share photos and stories abou
 For the backlog creation we used [Trello platform](https://trello.com/b/4mMTerl6/petbook).
 ![image](https://github.com/anamariapanait10/Petbook/blob/main/Trello.png)
 
-## Diagrams (UML, workflow)
+## Diagrams (ERD, UML)
 
 ![image](https://github.com/anamariapanait10/Petbook/blob/main/ERD.jpg)
 ![image](https://github.com/anamariapanait10/Petbook/blob/main/UML.png)
 
 ## Source control (branch creation, merge/rebase, pull requests)
+
+- For each implemented functionality we used separate branches that we merged in `main` branch after
+the functionality was ready. You can find the list of all branches created [here](https://github.com/anamariapanait10/Petbook/branches).
 ![image](https://github.com/anamariapanait10/Petbook/blob/main/Branches.png)
+- The list of all commits can be found [here](https://github.com/anamariapanait10/Petbook/commits/main).
 
 ## Automated tests
+- For testing we implemented several unit tests for pets controller to check that the CRUD operations work correctly. 
+![image](https://github.com/anamariapanait10/Petbook/blob/main/automated_tests.jpeg)
 
 ## Bug report
+We have encounter this bug: The Redirect to ShowNotifications page was not working and the 
+following error appeared:
+
 ![image](https://github.com/anamariapanait10/Petbook/blob/main/BugReport1.png)
 
+The ploblem was that the method from the controller was private instead of public, therefore couldn't be accessed from extern context.
+![image](https://github.com/anamariapanait10/Petbook/blob/main/BugReport2.png)
+
 ## Refactoring, code standards
+We used refactoring to rename variables and function names as suggestive as possible. We used the following coding style
+for the code: https://github.com/dotnet/runtime/blob/main/docs/coding-guidelines/coding-style.md.
 
 ## Comments
+We used many comments in this project to clearly explain the implementation.
 
 ## Design patterns
+-> **Model-View-Controller (MVC) Pattern:**
+
+The MVC pattern is the core architectural pattern used in `ASP.NET Core MVC` applications. It separates the application into three main components:
+
+- Model: Represents the data and business logic of the application.
+- View: Displays the user interface and interacts with the user.
+- Controller: Handles user input, updates the model, and selects the appropriate view to render.
+
+-> **Observer Design Pattern**
+
+The observer design pattern is used by default in MVC projects. 
+Its goal is to create this one-to-many relationship between the subject and all of the observers waiting for data so they can be updated 
+(relationship between a model and all the views associated with it). 
+
+To show its implementation in our project, we consider, for example, the `BlogPost` model, which is the subject, and the operations associated with a blog post: 
+- indexing all
+- adding a new post
+- deleting 
+- editing
+
+These operations are implemented using special views, which are the observers for the subject. Anytime the state of the BlogPost model changes, 
+all the observers will be notified and updated instanly.
 
 ## GitHub Copilot/chatGPT
+We used chatGPT to generate blog posts, post descriptions and the home page welcome message.
+![image](https://github.com/anamariapanait10/Petbook/blob/main/home_page_message.png)
+![image](https://github.com/anamariapanait10/Petbook/blob/main/blogposts.png)
 
+## Video demo
+The demo of the app can be found [here]().
