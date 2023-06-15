@@ -24,17 +24,36 @@ namespace Petbook.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
         }
-
+        [Authorize(Roles = "User,Admin")]
         public IActionResult Index()
         {
             var users = db.ApplicationUsers;
             ViewBag.UsersList = users;
             return View();
         }
+        
         [Authorize(Roles = "User,Admin")]
+        public IActionResult Following()
+        {
+            var id = _userManager.GetUserId(User);
+            var user = db.ApplicationUsers
+                            .Include("Following")
+                            .Where(u => u.Id == id)
+                            .First();
+            
+            ViewBag.Following = user.Following;
+            return View();
+        }
+        
+        [Authorize(Roles = "User,Admin")]
+        public IActionResult Followers()
+        {
+            var id = _userManager.GetUserId(User);
+            var user = db.ApplicationUsers
+                            .Include("Followers")
+                            .Where(u => u.Id == id)
+                            .First();
 
-<<<<<<< Updated upstream
-=======
             ViewBag.Followers = user.Followers;
             return View();
         }
@@ -51,22 +70,21 @@ namespace Petbook.Controllers
             var followingUser = db.ApplicationUsers
                         .Where(u => u.Id == userId)
                         .First();
-            currentUser.Following.Add(followingUser);
+            currentUser.Followers.Add(followingUser);
             db.SaveChanges();
         }
 
         [Authorize(Roles = "User,Admin")]
->>>>>>> Stashed changes
         public IActionResult Profile()
         {
             return Redirect("/ApplicationUsers/Show/" + _userManager.GetUserId(User));
 
         }
-
-        public async Task<ActionResult> Show(string id )
+        [Authorize(Roles = "User,Admin")]
+        public async Task<ActionResult> Show(string id)
         {
             ApplicationUser user = db.ApplicationUsers.Include("Followers").Include("Following").Include("Pets").Where(u=>u.Id==id).First();
-            ViewBag.UserCurent = user.Id;
+            ViewBag.UserCurent = _userManager.GetUserId(User);
             var roles = await _userManager.GetRolesAsync(user); 
 
             return View(user);

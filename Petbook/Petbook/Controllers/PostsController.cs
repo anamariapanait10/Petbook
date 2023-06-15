@@ -32,7 +32,20 @@ namespace Petbook.Controllers
         [Authorize(Roles = "User,Admin")]
         public IActionResult Index()
         {
-<<<<<<< Updated upstream
+            /*
+            var userId = _userManager.GetUserId(User);
+            var user = db.ApplicationUsers
+                                    .Include("Following")
+                                    .Where(u => u.Id == userId)
+                                    .First();
+            
+
+            var posts = new List<Post>();
+               foreach(var u in user.Following)
+            {
+
+            }
+            */
             var posts = db.Posts.Include("Pet")
                                 .Include("Pet.User")
                                 .Include("PostLikes")
@@ -41,36 +54,6 @@ namespace Petbook.Controllers
                                 .Where(p => p.Pet.UserId != _userManager.GetUserId(User))
                                 .OrderByDescending(p => p.PostDate)
                                 .ToList();
-=======
-
-            var userId = _userManager.GetUserId(User);
-            var user = db.ApplicationUsers
-                                    .Include("Following")
-                                    .Where(u => u.Id == userId)
-                                    .First();
-
-
-            var posts = new List<Post>();
-            foreach (var u in user.Following)
-            {
-                posts.AddRange(db.Posts.Include("Pet")
-                .Include("Pet.User")
-                .Include("PostLikes")
-                .Include("Comments")
-                .Include("Comments.User")
-                .Where(p => p.Pet.UserId != _userManager.GetUserId(User) && p.Pet.UserId == u.Id)
-                .ToList());
-            }
-
-            // var posts = db.Posts.Include("Pet")
-            //                     .Include("Pet.User")
-            //                     .Include("PostLikes")
-            //                     .Include("Comments")
-            //                     .Include("Comments.User")
-            //                     .Where(p => p.Pet.UserId != _userManager.GetUserId(User))
-            //                     .OrderByDescending(p => p.PostDate)
-            //                     .ToList();
->>>>>>> Stashed changes
 
             ViewBag.Posts = posts;
 

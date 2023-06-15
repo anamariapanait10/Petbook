@@ -11,6 +11,7 @@
 
 <script>
 
+
     function openFollowersPopup(Id) {
         $.ajax({
             type: "POST",
@@ -48,8 +49,12 @@
             {
                 <p><i class="bi bi-book"></i> BlogPosts: @Model.BlogPosts.Count</p>
             }  
-            <p onclick="openFollowersPopup(@Model.Id)"><i class="bi bi-journal-bookmark"></i> Followers: @Model.Followers.Count</p>
-            <p><i class="bi bi-journal-bookmark-fill"></i> Following: @Model.Following.Count</p>
+            <p>
+                <a style="text-decoration: none; color:black" href="/ApplicationUsers/Followers"><i class="bi bi-journal-bookmark"></i> Followers: @Model.Followers.Count</a>
+            </p>
+            <p>
+                <a style="text-decoration: none; color:black" href="/ApplicationUsers/Following"><i class="bi bi-journal-bookmark-fill"></i> Following: @Model.Following.Count</a>
+            </p>
         </div>
         
         <div class="d-flex flex-row justify-content-between p-3">
@@ -70,12 +75,20 @@
             </div>
         </div>
     </div>
+
+    @if (@Model.Id != ViewBag.UserCurent)
+    {   
+        <div style="text-align:right" class="px-4 pb-3">
+            <span onclick="followUserById('@Model.Id')" class="btn" style="border-color:#eab676; background-color: #eab676; color:white">Follow user</span>
+        </div>
+    }
     @if (@Model.Id == ViewBag.UserCurent)
     {
         <div style="text-align:right" class="px-4 pb-3">
             <a class="btn" style="border-color:#eab676; background-color: #eab676; color:white" href="/Pets/New">Add a pet</a>
         </div>
     }
+ 
 </div>
 
 <div>
@@ -97,6 +110,18 @@
 </div>
 
 
-
+<script>
+    function followUserById(userId) {
+        $.ajax({
+            type: "POST",
+            url: '/ApplicationUsers/FollowUserById/' + userId,
+            contentType: "application/text; charset=utf-8",
+            dataType: "text",
+            async: false,
+            success: function (data) {
+            }
+        })
+    }
+</script>
 
 

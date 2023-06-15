@@ -54,7 +54,8 @@ the functionality was ready. You can find the list of all branches created [here
 - The list of all commits can be found [here](https://github.com/anamariapanait10/Petbook/commits/main).
 
 ## Automated tests
-- For testing we implemented several unit tests for pets controller to check that the CRUD operations work correctly. 
+- For testing we implemented several unit tests for pets controller to check that the CRUD operations work correctly.
+
 ![image](https://github.com/anamariapanait10/Petbook/blob/main/automated_tests.jpeg)
 
 ## Bug report
@@ -65,6 +66,8 @@ following error appeared:
 
 The ploblem was that the method from the controller was private instead of public, therefore couldn't be accessed from extern context.
 ![image](https://github.com/anamariapanait10/Petbook/blob/main/BugReport2.png)
+
+See [PR link](https://github.com/anamariapanait10/Petbook/pull/22) for more detailes.
 
 ## Refactoring, code standards
 We used refactoring to rename variables and function names as suggestive as possible. We used the following coding style
@@ -103,4 +106,4 @@ We used chatGPT to generate blog posts, post descriptions and the home page welc
 ![image](https://github.com/anamariapanait10/Petbook/blob/main/blogposts.png)
 
 ## Video demo
-The demo of the app can be found [here]().
+The demo of the app can be found [here](https://clipchamp.com/watch/wjEAuSDg97g).

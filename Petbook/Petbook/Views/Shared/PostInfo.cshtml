@@ -31,7 +31,9 @@
                 <div class="d-flex row text-lg-start">
                     <div class="d-flex col">
                         <img style="width:55px; height:55px" class="rounded-circle px-2 py-2" src=@Model.Pet.PetPhoto alt="No photo">
-                        <span class="card-title d-block mt-2" style="font-size: 22px; font-weight: 400"><b>@Model.Pet.PetName</b></span>
+                        <a style="text-decoration: none; color:black" href="/ApplicationUsers/Show/@Model.Pet.UserId">
+                            <span class="card-title d-block mt-2" style="font-size: 22px; font-weight: 400"><b>@Model.Pet.PetName</b></span>
+                        </a>
                     </div>
                     <span class="card-subtitle d-block mx-2 mb-1" style="font-size: 14px; font-weight: 200">~ owned by @Model.Pet.User.UserName ~</span>
                 </div>
